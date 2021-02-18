@@ -9,6 +9,7 @@ endif (APPLE)
 
 #List of test executables
 set(vec3_test_exe "vec3_test.exe")
+set(particle_test_exe "particle_test.exe")
 
 #Variables of libraries used in the test
 #find_library(vec3_lib vec3 ${PROJECT_BINARY_DIR}/lib)
@@ -18,6 +19,15 @@ set(vec3_test_exe "vec3_test.exe")
 add_executable("${vec3_test_exe}" vec3_test)
 target_link_libraries (${vec3_test_exe} 
                        vec3
+                       ${Boost_FILESYSTEM_LIBRARY}
+                       ${Boost_SYSTEM_LIBRARY}
+                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+                       )
+
+add_executable("${particle_test_exe}" particle_test)
+target_link_libraries (${particle_test_exe} 
+                       vec3
+                       particle
                        ${Boost_FILESYSTEM_LIBRARY}
                        ${Boost_SYSTEM_LIBRARY}
                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}

@@ -24,6 +24,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 link_directories(${PROJECT_BINARY_DIR}/lib)
 #Executable folder
 set(vec3_test_exe "vec3_test.exe")
+set(particle_test_exe "particle_test.exe")
 
 string(APPEND CMAKE_CXX_FLAGS " -Wall")
 
@@ -33,3 +34,4 @@ add_subdirectory (unit_tests)
 
 enable_testing()
 add_test(Vec3 ${PROJECT_BINARY_DIR}/unit_tests/${vec3_test_exe})
+add_test(Particle ${PROJECT_BINARY_DIR}/unit_tests/${particle_test_exe})
