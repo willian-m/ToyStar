@@ -9,7 +9,6 @@ BOOST_AUTO_TEST_CASE( constructor_particle_test ){
     Vec3<double> a(10., 12., 13.);
     Particle<double> particle1_test(1., 2., 3., .1, .2, .3, 10., 12., 13., 3.14);
     Particle<double> particle2_test(r, v, a, 6.28);
-    //Particle<double> particle_test(1., 2., 3., .1, .2, .3, 10., 12., 13., 3.14);
 
     BOOST_CHECK( particle1_test.get_x() == 1. );
     BOOST_CHECK( particle1_test.get_y() == 2. );
@@ -45,8 +44,7 @@ BOOST_AUTO_TEST_CASE( update_particle_test ){
     Particle<double> particle1_test(1., 2., 3., .1, .2, .3, 10., 12., 13., 3.14);
     Particle<double> particle2_test(r, v, a, 6.28);
     Particle<double> particle3_test(1., 2., 3., .1, .2, .3, 10., 12., 13., 3.14);
-    //Particle<double> particle_test(1., 2., 3., .1, .2, .3, 10., 12., 13., 3.14);
-
+   
     particle1_test.set_x(1.1);
     particle1_test.set_y(2.1);
     particle1_test.set_z(3.1);
