@@ -35,5 +35,23 @@ Vec3<T>::Vec3(T x, T y, T z){
     this->z = z;
 }
 
+template<class T>
+Vec3<T> Vec3<T>::operator*(double c){
+    Vec3<T> r(0.,.0,.0);
+    r.x = c*this->x;
+    r.y = c*this->y;
+    r.z = c*this->z;
 
+    return r;
+}
+
+template<class T>
+Vec3<T> Vec3<T>::operator+(const Vec3<T> v){
+    Vec3<T> r(0.,.0,.0);
+    r.x = v.x+this->x;
+    r.y = v.y+this->y;
+    r.z = v.z+this->z;
+
+    return r;
+}
 
