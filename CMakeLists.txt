@@ -26,6 +26,7 @@ link_directories(${PROJECT_BINARY_DIR}/lib)
 set(vec3_test_exe "vec3_test.exe")
 set(particle_test_exe "particle_test.exe")
 set(sph_math_test_exe "sph_math_test.exe")
+set(particle_system_test_exe "particle_system_test.exe")
 
 string(APPEND CMAKE_CXX_FLAGS " -Wall")
 
@@ -36,3 +37,4 @@ enable_testing()
 add_test(Vec3 ${PROJECT_BINARY_DIR}/unit_tests/${vec3_test_exe})
 add_test(Particle ${PROJECT_BINARY_DIR}/unit_tests/${particle_test_exe})
 add_test(SPHMath ${PROJECT_BINARY_DIR}/unit_tests/${sph_math_test_exe})
+add_test(ParticleSystem ${PROJECT_BINARY_DIR}/unit_tests/${particle_system_test_exe})
