@@ -17,6 +17,11 @@ set_target_properties (sph_math PROPERTIES COMPILE_FLAGS "${CompileFlags}")
 set_target_properties (sph_math PROPERTIES VERSION "0.1.0")
 set_target_properties(sph_math PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib/)
 
+add_library(eos_polytropic SHARED eos_polytropic.cxx)
+set_target_properties (eos_polytropic PROPERTIES COMPILE_FLAGS "${CompileFlags}")
+set_target_properties (eos_polytropic PROPERTIES VERSION "0.1.0")
+set_target_properties(eos_polytropic PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib/)
+
 add_library(particle_system SHARED particle_system.cxx)
 set_target_properties (particle_system PROPERTIES COMPILE_FLAGS "${CompileFlags}")
 set_target_properties (particle_system PROPERTIES VERSION "0.1.0")

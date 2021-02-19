@@ -45,6 +45,7 @@ target_link_libraries (${sph_math_test_exe}
 add_executable("${particle_system_test_exe}" particle_system_test)
 target_link_libraries (${particle_system_test_exe}
                        sph_math
+                       eos_polytropic
                        particle
                        particle_system 
                        vec3
