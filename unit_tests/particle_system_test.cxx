@@ -4,11 +4,15 @@
 
 #include <stdio.h>
 #include <vector>
+
 #include "vec3.h"
+#include "eos_polytropic.h"
 
 #define TOL 1.E-15
 
 BOOST_AUTO_TEST_CASE( density_test ){
+
+    EOSPolytropic* eos = new EOSPolytropic(1.,1.);
 
     int nx = 100;
     int ny = 100;
@@ -32,7 +36,7 @@ BOOST_AUTO_TEST_CASE( density_test ){
     }
 
     std::cout << "Creatimg system";
-    ParticleSystem test_sys(r,v,m,h);
+    ParticleSystem test_sys(r,v,m,h,1.,1., eos);
     
     Vec3<double> r_probe(50*Lx/nx - Lx/2., 50*Ly/ny - Ly/2., 0);
     double density_predicted = SPHMath::kernel_spline3D(Vec3<double>(0.,0.,0.), Vec3<double>(0.,0.,0.), h);
@@ -40,5 +44,7 @@ BOOST_AUTO_TEST_CASE( density_test ){
     BOOST_CHECK_MESSAGE( abs(test_sys.get_density(r_probe) -  density_predicted) < TOL,
                          "Wrong density computed. Density is "<<test_sys.get_density(r_probe)
                          << ". It should be "<< 1./(4.*M_PI*std::pow(Lx/nx,3)));
+
+    delete eos;
 
 }
