@@ -5,8 +5,8 @@
 /** \class Particle
  A class to store SPH particle properties. There is no dynamic in here
 */
-template<class T>
-Particle<T>::Particle(T x, T y, T z, T vx, T vy, T vz, T ax, T ay, T az, T mass){
+
+Particle::Particle(double x, double y, double z, double vx, double vy, double vz, double ax, double ay, double az, double mass){
 
     r.x = x;
     r.y = y;
@@ -24,8 +24,8 @@ Particle<T>::Particle(T x, T y, T z, T vx, T vy, T vz, T ax, T ay, T az, T mass)
     ///TODO: Init pressure
 }
 
-template<class T>
-Particle<T>::Particle(Vec3<T> r_in, Vec3<T> v_in, Vec3<T> a_in, T mass){
+
+Particle::Particle(Vec3<double> r_in, Vec3<double> v_in, Vec3<double> a_in, double mass){
     r = r_in;
     v = v_in;
     a = a_in;
@@ -34,22 +34,22 @@ Particle<T>::Particle(Vec3<T> r_in, Vec3<T> v_in, Vec3<T> a_in, T mass){
 }
 
 
-template<class T>
-void Particle<T>::set_position(T x, T y, T z){
+
+void Particle::set_position(double x, double y, double z){
     r.x = x;
     r.y = y;
     r.z = z;
 }
 
-template<class T>
-void Particle<T>::set_velocity(T vx, T vy, T vz){
+
+void Particle::set_velocity(double vx, double vy, double vz){
     v.x = vx;
     v.y = vy;
     v.z = vz;
 }
 
-template<class T>
-void Particle<T>::set_acceleration(T ax, T ay, T az){
+
+void Particle::set_acceleration(double ax, double ay, double az){
     a.x = ax;
     a.y = ay;
     a.z = az;
