@@ -33,6 +33,15 @@ target_link_libraries (${particle_test_exe}
                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
                        )
 
+add_executable("${sph_math_test_exe}" sph_math_test)
+target_link_libraries (${sph_math_test_exe} 
+                       vec3
+                       sph_math
+                       ${Boost_FILESYSTEM_LIBRARY}
+                       ${Boost_SYSTEM_LIBRARY}
+                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+                       )
+
 #set_target_properties (${vec3_test_exe} PROPERTIES COMPILE_FLAGS "${CompileFlags}")
 #et_target_properties (${vec3_test_exe} PROPERTIES LINK_FLAGS "-lvec3")
                        
