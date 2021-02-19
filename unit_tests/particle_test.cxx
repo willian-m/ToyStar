@@ -33,6 +33,8 @@ BOOST_AUTO_TEST_CASE( constructor_particle_test ){
     BOOST_CHECK( particle2_test.get_acceleration().x == 10. );
     BOOST_CHECK( particle2_test.get_acceleration().y == 12. );
     BOOST_CHECK( particle2_test.get_acceleration().z == 13. );
+
+    BOOST_CHECK( particle2_test.get_mass() == 6.28 );
    
 }
 

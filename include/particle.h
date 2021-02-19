@@ -54,6 +54,7 @@ public:
     double get_ax();
     double get_ay();
     double get_az();
+    double get_mass();
     
 };
 
@@ -80,20 +81,18 @@ inline Vec3<double> Particle::get_velocity(){ return v;};
 inline Vec3<double> Particle::get_acceleration(){ return a;};
 
 
-double Particle::get_x(){ return r.x;};
-double Particle::get_y(){ return r.y;};
-double Particle::get_z(){ return r.z;};
+inline double Particle::get_x(){ return r.x;};
+inline double Particle::get_y(){ return r.y;};
+inline double Particle::get_z(){ return r.z;};
 
+inline double Particle::get_vx(){ return v.x;};
+inline double Particle::get_vy(){ return v.y;};
+inline double Particle::get_vz(){ return v.z;};
 
-double Particle::get_vx(){ return v.x;};
-double Particle::get_vy(){ return v.y;};
-double Particle::get_vz(){ return v.z;};
+inline double Particle::get_ax(){ return a.x;};
+inline double Particle::get_ay(){ return a.y;};
+inline double Particle::get_az(){ return a.z;};
 
-
-double Particle::get_ax(){ return a.x;};
-
-double Particle::get_ay(){ return a.y;};
-
-double Particle::get_az(){ return a.z;};
+inline double Particle::get_mass(){ return mass;};
 
 #endif
