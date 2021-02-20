@@ -10,8 +10,8 @@ ParticleSystem::ParticleSystem(std::vector<Vec3<double>> r,
     assert(lh > 0);
     h = lh;
     eos = leos;
-    assert(lnu > 0);
-    assert(llambda > 0);
+    assert(lnu >= 0.);
+    assert(llambda >= 0.);
 
     nu = lnu;
     lambda = llambda;
@@ -64,9 +64,9 @@ Vec3<double> ParticleSystem::get_acceleration(int ipart){
         Vec3<double> r_j = sph_particles[jpart].get_position();
         double rho_j = get_density(r_j);
         double P_j = eos->get_pressure(rho_i);
-        double p_over_rho2_j = P_i/(rho_j*rho_j);
+        double p_over_rho2_j = P_j/(rho_j*rho_j);
         Vec3<double> gradient = SPHMath::gradient_kernel_spline3D(ri,r_j,this->h);
-        acc = acc + gradient*p_over_rho2_j;   
+        acc = acc + gradient*(p_over_rho2_j+p_over_rho2_i)*(-1.*m);   
     }
 
     return acc;
