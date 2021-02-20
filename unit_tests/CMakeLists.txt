@@ -54,6 +54,19 @@ target_link_libraries (${particle_system_test_exe}
                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
                        )
 
+add_executable("${rk4_test_exe}" rk4_test)
+target_link_libraries (${rk4_test_exe}
+                       sph_math
+                       eos_polytropic
+                       particle
+                       particle_system 
+                       vec3
+                       integrator_base
+                       integrator_rk4
+                       ${Boost_FILESYSTEM_LIBRARY}
+                       ${Boost_SYSTEM_LIBRARY}
+                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+                       )
 #set_target_properties (${vec3_test_exe} PROPERTIES COMPILE_FLAGS "${CompileFlags}")
 #et_target_properties (${vec3_test_exe} PROPERTIES LINK_FLAGS "-lvec3")
                        
