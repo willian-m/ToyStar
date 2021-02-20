@@ -30,6 +30,10 @@ public:
                     EOSBase* leos); //TODO: Test EOS
     double get_density(Vec3<double> r);
     Vec3<double> get_acceleration(int ipart); //TODO: Test get accelleration
+    int get_nparticles();
+    Particle* get_particle(int ipart);
 };
 
+inline int ParticleSystem::get_nparticles(){return nparticles;};
+inline Particle* ParticleSystem::get_particle(int ipart){return &(sph_particles[ipart]); };
 #endif
