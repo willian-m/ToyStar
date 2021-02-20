@@ -25,7 +25,7 @@ public:
                    double dt);
 
     virtual void do_step() = 0; ///< Derived class must specify how to perform time-steps
-    void update_system();
+    virtual void update_system() = 0;
 
     
 };

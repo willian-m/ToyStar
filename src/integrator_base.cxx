@@ -29,12 +29,3 @@ IntegratorBase::IntegratorBase(ParticleSystem* lcurrent_sys,
     assert(nparticles == next_sys->get_nparticles() && "Next system has different number of particles than the current one");
     
 }
-
-void IntegratorBase::update_system(){
-
-    ParticleSystem* aux = previous_sys;
-    previous_sys = current_sys;
-    current_sys = next_sys;
-    next_sys = aux;
-
-}
