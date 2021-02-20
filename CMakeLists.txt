@@ -35,6 +35,20 @@ string(APPEND CMAKE_CXX_FLAGS " -Wall")
 add_subdirectory (src)
 add_subdirectory (unit_tests)
 
+
+add_executable(ToyStar.exe src/ToyStar)
+target_link_libraries (ToyStar.exe 
+                       sph_math
+                       eos_polytropic
+                       particle
+                       particle_system 
+                       vec3
+                       integrator_base
+                       integrator_rk4
+                       )
+
+
+
 enable_testing()
 add_test(Vec3 ${PROJECT_BINARY_DIR}/unit_tests/${vec3_test_exe})
 add_test(Particle ${PROJECT_BINARY_DIR}/unit_tests/${particle_test_exe})
