@@ -19,8 +19,14 @@ private:
 
 public:
 
+    IntegratorRK4(ParticleSystem* current, ParticleSystem* next, double dt);
     void do_step();
+    void update_system();
 
 };
+
+inline IntegratorRK4::IntegratorRK4(ParticleSystem* current, 
+                                    ParticleSystem* next, 
+                                    double dt):IntegratorBase(current, next, dt){};
 
 #endif

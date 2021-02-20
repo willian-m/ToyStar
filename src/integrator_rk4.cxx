@@ -32,6 +32,13 @@ void IntegratorRK4::do_step(){
 
 }
 
+void IntegratorRK4::update_system(){
+
+    ParticleSystem* aux = current_sys;
+    current_sys = next_sys;
+    next_sys = aux;
+}
+
 std::array<Vec3<double>,2> IntegratorRK4::get_k1(int ipart){
     std::array<Vec3<double>,2> k1;
     k1[0] = current_sys->get_particle(ipart)->get_velocity();
@@ -53,7 +60,7 @@ std::array<Vec3<double>,2> IntegratorRK4::get_k3(int ipart){
     return k3;
 }
 
-std::array<Vec3<double>,2> IntegratorRK4::get_k3(int ipart){
+std::array<Vec3<double>,2> IntegratorRK4::get_k4(int ipart){
     std::array<Vec3<double>,2> k4;
     k4[0] = next_sys->get_particle(ipart)->get_velocity();
     k4[1] = next_sys->get_acceleration(ipart);
