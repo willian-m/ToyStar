@@ -29,7 +29,7 @@ public:
                    std::vector<double> mass, double lh,double lambda, double nu,
                     EOSBase* leos); //TODO: Test EOS
     double get_density(Vec3<double> r);
-    Vec3<double> get_acceleration(int ipart); //TODO: Test get accelleration
+    Vec3<double> get_acceleration(int ipart);
     int get_nparticles();
     Particle* get_particle(int ipart);
 };
