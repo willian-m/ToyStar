@@ -4,12 +4,11 @@
 
 #include <vector>
 #include <stdio.h>
+#include <iomanip> 
 
 #include "vec3.h"
 #include "eos_polytropic.h"
 #include "particle_system.h"
-
-#define TOL 1.E-6
 
 BOOST_AUTO_TEST_CASE( harmonic_oscillator_test ){
 
@@ -33,26 +32,74 @@ BOOST_AUTO_TEST_CASE( harmonic_oscillator_test ){
 
     //Integrator parameters
     double total_time = 2.0*M_PI;
-    int nsteps = 10000000;
+    int nsteps = 100000;
     double dt = total_time/nsteps;
     
     //Init integrator
     IntegratorRK4 integrator(&current,&next,dt);
     
 
-    for(int istep; istep<nsteps;++istep){
+    for(int istep=0; istep<nsteps;++istep){
         integrator.do_step();
         integrator.update_system();
     }
 
-    BOOST_CHECK_MESSAGE( abs(next.get_particle(0)->get_x() - 1.) < TOL,
-                        "Particle at position: "<<next.get_particle(0)->get_x()<<
+    std::cout << "Position deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)->get_x() - 1.) << std::endl;
+    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_x() - 1.) < TOL*100,
+                        "Particle at position: "<<current.get_particle(0)->get_x()<<
                         ". Expected at 1.");
 
-    BOOST_CHECK_MESSAGE( abs(next.get_particle(0)->get_vx()) < TOL,
-                        "Particle with velocity: "<<next.get_particle(0)->get_vx()<<
+    std::cout << "Velocity deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)->get_vx()) << std::endl;
+    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_vx()) < TOL*100,
+                        "Particle with velocity: "<<current.get_particle(0)->get_vx()<<
                         ". Expected it to be at rest.");
 
     
 }
 
+BOOST_AUTO_TEST_CASE( damped_harmonic_oscillator ){
+
+    //setup particle system
+    EOSPolytropic* eos = new EOSPolytropic(1.,1.);
+
+    std::vector<Vec3<double>> r;
+    std::vector<Vec3<double>> v;
+    std::vector<double> m;
+
+    Vec3<double> pos(2., .0, .0);
+    Vec3<double> vel(3., .0, .0);
+
+    r.push_back(pos);
+    v.push_back(vel);
+    m.push_back(1.0);
+
+
+    ParticleSystem currents(r,v,m,.1,1.,1.0,eos);
+    ParticleSystem nexts(r,v,m,.1,1.,1.0,eos);
+
+    //Integrator parameters
+    double total_time = 2.0*M_PI*20.;
+    int nsteps = 10000;
+    double dt = total_time/nsteps;
+    
+    //Init integrator
+    IntegratorRK4 integrator(&currents,&nexts,dt);
+    
+    
+    for(int istep=0; istep<nsteps;++istep){
+        integrator.do_step();
+        integrator.update_system();
+    }
+    std::cout << std::endl;
+    std::cout << "Position deviation from expected: "<< std::setprecision(15) << abs(currents.get_particle(0)->get_x() ) << std::endl;
+    BOOST_CHECK_MESSAGE( abs(currents.get_particle(0)->get_x() ) < TOL,
+                        "Particle at position: "<<currents.get_particle(0)->get_x()<<
+                        ". Expected at 0.");
+
+        std::cout << "Velocity deviation from expected: "<< std::setprecision(15) << abs(currents.get_particle(0)->get_vx()) << std::endl;
+    BOOST_CHECK_MESSAGE( abs(currents.get_particle(0)->get_vx()) < TOL,
+                        "Particle with velocity: "<<currents.get_particle(0)->get_vx()<<
+                        ". Expected it to be at rest.");
+
+    
+}
