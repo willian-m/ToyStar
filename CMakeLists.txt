@@ -6,8 +6,8 @@ project(ToyStar VERSION 0.1.0 LANGUAGES CXX)
 
 # default build type: Release
 if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release")
-    #set(CMAKE_BUILD_TYPE "Debug")
+    #set(CMAKE_BUILD_TYPE "Release")
+    set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -43,7 +43,6 @@ target_link_libraries (ToyStar.exe
                        particle
                        particle_system 
                        vec3
-                       integrator_base
                        integrator_rk4
                        )
 

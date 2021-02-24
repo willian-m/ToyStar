@@ -15,14 +15,14 @@ protected:
     int nparticles;
 
 public:
-    IntegratorBase(ParticleSystem* previous_sys,
+    /*IntegratorBase(ParticleSystem* previous_sys,
                    ParticleSystem* current_sys,
                    ParticleSystem* next_sys,
                    double dt);
 
     IntegratorBase(ParticleSystem* current_sys,
                    ParticleSystem* next_sys,
-                   double dt);
+                   double dt);*/
 
     virtual void do_step() = 0; ///< Derived class must specify how to perform time-steps
     virtual void update_system() = 0;

@@ -61,7 +61,6 @@ target_link_libraries (${rk4_test_exe}
                        particle
                        particle_system 
                        vec3
-                       integrator_base
                        integrator_rk4
                        ${Boost_FILESYSTEM_LIBRARY}
                        ${Boost_SYSTEM_LIBRARY}

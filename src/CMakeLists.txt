@@ -27,11 +27,6 @@ set_target_properties (particle_system PROPERTIES COMPILE_FLAGS "${CompileFlags}
 set_target_properties (particle_system PROPERTIES VERSION "0.1.0")
 set_target_properties(particle_system PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib/)
 
-add_library(integrator_base SHARED integrator_base.cxx)
-set_target_properties (particle_system PROPERTIES COMPILE_FLAGS "${CompileFlags}")
-set_target_properties (particle_system PROPERTIES VERSION "0.1.0")
-set_target_properties(particle_system PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib/)
-
 add_library(integrator_rk4 SHARED integrator_rk4.cxx)
 set_target_properties (particle_system PROPERTIES COMPILE_FLAGS "${CompileFlags}")
 set_target_properties (particle_system PROPERTIES VERSION "0.1.0")
