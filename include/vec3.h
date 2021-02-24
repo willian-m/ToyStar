@@ -13,8 +13,8 @@ public:
 
     Vec3();
     Vec3(T x, T y, T z);
-    Vec3<T> operator* (double x); //TODO: Needs testing
-    Vec3<T> operator+ (const Vec3<T> v); //TODO: Needs testing
+    Vec3<T> operator* (double x);
+    Vec3<T> operator+ (const Vec3<T> v);
 };
 
 //Allowed values of the template

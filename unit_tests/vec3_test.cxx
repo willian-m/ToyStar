@@ -21,3 +21,24 @@ BOOST_AUTO_TEST_CASE( update_vec3_test ){
     BOOST_CHECK( test_vec3.y == 20. );
     BOOST_CHECK( test_vec3.z == 30. );
 }
+
+BOOST_AUTO_TEST_CASE( multiply_vec3_by_scalar ){
+    Vec3<double> test_vec3(1.,2.,3.);
+    
+    Vec3<double> res = test_vec3*10.;
+
+    BOOST_CHECK( res.x == 10. );
+    BOOST_CHECK( res.y == 20. );
+    BOOST_CHECK( res.z == 30. );
+}
+
+BOOST_AUTO_TEST_CASE( sum_vec3 ){
+    Vec3<double> test_vec3_A(1.,2.,3.);
+    Vec3<double> test_vec3_B(3.,4.,5.);
+    
+    Vec3<double> res = test_vec3_A+test_vec3_B;
+
+    BOOST_CHECK( res.x == 4. );
+    BOOST_CHECK( res.y == 6. );
+    BOOST_CHECK( res.z == 8. );
+}
