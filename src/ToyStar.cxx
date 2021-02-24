@@ -10,13 +10,8 @@
 
 int main(int argc, char* argv[]){
 
-    //System parameters
-    const double total_time = 16*10;
-    const int nsteps = 400*10;
-    const double dt = total_time/nsteps;
-
     //System parameters - initial positions
-    const double L = 2.;
+    const double L = .75;
     const int nside = 8;
     const double dL = L/nside;
 
@@ -35,7 +30,7 @@ int main(int argc, char* argv[]){
     //Get attractive constant
     const double fact1 = 2*pressure_const*(1+poly_const)*pow(M_PI,-3./(2*poly_const));
     const double fact2 = tgamma(5./2. + poly_const)*star_mass/(tgamma(1.+poly_const)*pow(star_radius,3));
-    double lambda = fact1*fact2/pow(star_mass,2);
+    double lambda = fact1*pow(fact2,1./poly_const)/pow(star_radius,2);
 
 
     //Creates particles
@@ -57,18 +52,32 @@ int main(int argc, char* argv[]){
         }
     }
 
+    //Each particle behaves as an damped HO. We use our knowledge of the 
+    //anallytic solution to estimate how much time we must wait to get 
+    //to the stationary solution 
+
+    double damping_time = 2./damping;
+
+
+
+    //System parameters
+    const double total_time = 16;//damping_time*300;
+    const int nsteps = 400;
+    const double dt = total_time/nsteps;
+
 
 
 
     //Init particle system
     ParticleSystem current(r,v,m,smoothing,lambda,damping,eos);
     ParticleSystem next(r,v,m,smoothing,lambda,damping,eos);
+    ParticleSystem buffer(r,v,m,smoothing,lambda,damping,eos);
 
     //Init integrator
-    IntegratorRK4 integrator(&current,&next,dt);
+    IntegratorRK4 integrator(&current,&next,&buffer,dt);
     
     //Simulate it!    
-    int barWidth = 70; //For progress bar
+    int barWidth = 70; //Width of progress bar
     for(int istep=0; istep<nsteps;++istep){
         
         //Evolve the system

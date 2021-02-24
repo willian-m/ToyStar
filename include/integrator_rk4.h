@@ -11,22 +11,14 @@ class IntegratorRK4 : public IntegratorBase{
 
 private:
 
-    std::array<Vec3<double>,2> get_k1(int ipart);
-    std::array<Vec3<double>,2> get_k2(int ipart);
-    std::array<Vec3<double>,2> get_k3(int ipart);
-    std::array<Vec3<double>,2> get_k4(int ipart);
-
+    ParticleSystem* buffer;
 
 public:
 
-    IntegratorRK4(ParticleSystem* current, ParticleSystem* next, double dt);
+    IntegratorRK4(ParticleSystem* current, ParticleSystem* next, ParticleSystem* buffer, double dt);
     void do_step();
     void update_system();
 
 };
-
-inline IntegratorRK4::IntegratorRK4(ParticleSystem* current, 
-                                    ParticleSystem* next, 
-                                    double dt):IntegratorBase(current, next, dt){};
 
 #endif

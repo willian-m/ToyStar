@@ -2,33 +2,84 @@
 
 void IntegratorRK4::do_step(){
     const double dt_over_two = dt*.5;
-    for (int ipart=0; ipart < nparticles; ++ipart){
 
+    Vec3<double> pos(.0,.0,.0);
+    Vec3<double> vel(.0,.0,.0);
+
+    std::vector<Vec3<double>> k1_acc, k2_acc, k3_acc, k4_acc;
+    std::vector<Vec3<double>> k1_vel, k2_vel, k3_vel, k4_vel;
+
+    //First approximation
+    for (int ipart=0; ipart < nparticles; ++ipart){
+        Particle* particle_current = current_sys->get_particle(ipart);
+        Particle* particle_buffer = buffer->get_particle(ipart);
+        
+        vel = particle_current->get_velocity();
+        pos = particle_current->get_position();
+
+        k1_acc.push_back(particle_current->get_acceleration());
+        k1_vel.push_back(vel);
+        
+        particle_buffer->set_velocity(vel+k1_acc[ipart]*dt_over_two);
+        particle_buffer->set_position(pos+k1_vel[ipart]*dt_over_two);
+    }
+    buffer->update_acceleration(); //Estimation 1 for the system @ t+ dt/2
+
+    //Second approximation
+    for (int ipart=0; ipart < nparticles; ++ipart){
         Particle* particle_current = current_sys->get_particle(ipart);
         Particle* particle_next = next_sys->get_particle(ipart);
+        Particle* particle_buffer = buffer->get_particle(ipart);
+        
+        k2_acc.push_back(particle_buffer->get_acceleration());
+        k2_vel.push_back(particle_buffer->get_velocity());
+
+        vel = particle_current->get_velocity();
+        pos = particle_current->get_position();
+
+        particle_next->set_velocity(vel+k2_acc[ipart]*dt_over_two);
+        particle_next->set_position(pos+k2_vel[ipart]*dt_over_two);
+    }
+    next_sys->update_acceleration(); //Estimation 2 for the system @ t+ dt/2
+
+    //Third approximation
+    for (int ipart=0; ipart < nparticles; ++ipart){
+        Particle* particle_current = current_sys->get_particle(ipart);
+        Particle* particle_next = next_sys->get_particle(ipart);
+        Particle* particle_buffer = buffer->get_particle(ipart);
         
         //First approximation
-        std::array<Vec3<double>,2> k1 = get_k1(ipart);
-        particle_next->set_velocity(particle_current->get_velocity()+k1[1]*dt_over_two);
-        particle_next->set_position(particle_current->get_position()+k1[0]*dt_over_two);
-
-        //Second approximation
-        std::array<Vec3<double>,2> k2 = get_k2(ipart);
-        particle_next->set_velocity(particle_current->get_velocity()+k2[1]*dt_over_two);
-        particle_next->set_position(particle_current->get_position()+k2[0]*dt_over_two);
+        k3_acc.push_back(particle_next->get_acceleration());
+        k3_vel.push_back(particle_next->get_velocity());
         
-        //Third approximation
-        std::array<Vec3<double>,2> k3 = get_k3(ipart);
-        particle_next->set_velocity(particle_current->get_velocity()+k3[1]*dt);
-        particle_next->set_position(particle_current->get_position()+k3[0]*dt);
+        vel = particle_current->get_velocity();
+        pos = particle_current->get_position();
 
-        //Final approximation
-        std::array<Vec3<double>,2> k4 = get_k4(ipart);
-        particle_next->set_velocity(
-            particle_current->get_velocity() + (k1[1] + k2[1]*2. + k3[1]*2. + k4[1])*(dt/6.) );
-        particle_next->set_position(
-            particle_current->get_position() + (k1[0] + k2[0]*2. + k3[0]*2. + k4[0])*(dt/6.) );
+        particle_buffer->set_velocity(vel+k3_acc[ipart]*dt);
+        particle_buffer->set_position(pos+k3_vel[ipart]*dt);
     }
+    buffer->update_acceleration(); //Estimation 1 for the system @ t+ dt
+
+    //Fourth approximation
+    for (int ipart=0; ipart < nparticles; ++ipart){
+        Particle* particle_current = current_sys->get_particle(ipart);
+        Particle* particle_next = next_sys->get_particle(ipart);
+        Particle* particle_buffer = buffer->get_particle(ipart);
+        
+        //First approximation
+        k4_acc.push_back(particle_buffer->get_acceleration());
+        k4_vel.push_back(particle_buffer->get_velocity());
+        
+        vel = particle_current->get_velocity();
+        pos = particle_current->get_position();
+
+        Vec3<double> avrg_acc = (k1_acc[ipart]+k2_acc[ipart]*2.+k3_acc[ipart]*2.+k4_acc[ipart])*(1./6.);
+        Vec3<double> avrg_vel = (k1_vel[ipart]+k2_vel[ipart]*2.+k3_vel[ipart]*2.+k4_vel[ipart])*(1./6.);
+
+        particle_next->set_velocity(vel+avrg_acc*dt);
+        particle_next->set_position(pos+avrg_vel*dt);
+    }
+    next_sys->update_acceleration(); //Estimation 2 for the system @ t+ dt
 
 }
 
@@ -39,30 +90,17 @@ void IntegratorRK4::update_system(){
     next_sys = aux;
 }
 
-std::array<Vec3<double>,2> IntegratorRK4::get_k1(int ipart){
-    std::array<Vec3<double>,2> k1;
-    k1[0] = current_sys->get_particle(ipart)->get_velocity();
-    k1[1] = current_sys->get_acceleration(ipart);
-    return k1;
-}
+IntegratorRK4::IntegratorRK4(ParticleSystem* lcurrent, 
+                             ParticleSystem* lnext,
+                             ParticleSystem* lbuffer, 
+                             double ldt){
 
-std::array<Vec3<double>,2> IntegratorRK4::get_k2(int ipart){
-    std::array<Vec3<double>,2> k2;
-    k2[0] = next_sys->get_particle(ipart)->get_velocity();
-    k2[1] = next_sys->get_acceleration(ipart);
-    return k2;
-}
-
-std::array<Vec3<double>,2> IntegratorRK4::get_k3(int ipart){
-    std::array<Vec3<double>,2> k3;
-    k3[0] = next_sys->get_particle(ipart)->get_velocity();
-    k3[1] = next_sys->get_acceleration(ipart);
-    return k3;
-}
-
-std::array<Vec3<double>,2> IntegratorRK4::get_k4(int ipart){
-    std::array<Vec3<double>,2> k4;
-    k4[0] = next_sys->get_particle(ipart)->get_velocity();
-    k4[1] = next_sys->get_acceleration(ipart);
-    return k4;
-}
+    current_sys = lcurrent;
+    next_sys = lnext;
+    buffer = lbuffer;
+    dt = ldt;
+    
+    nparticles = current_sys->get_nparticles();
+    assert(nparticles == buffer->get_nparticles() && "Buffer system has different number of particles than the current one");
+    assert(nparticles == next_sys->get_nparticles() && "Next system has different number of particles than the current one");
+};
