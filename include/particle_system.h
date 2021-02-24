@@ -20,20 +20,25 @@ private:
     double nu;
     EOSBase* eos;
 
-    std::vector<int> get_neighbour_table(Vec3<double> r);
+    std::vector<std::vector<int>> neighbour_table;
     
-
 
 public:
     ParticleSystem(std::vector<Vec3<double>> r, std::vector<Vec3<double>> v, 
                    std::vector<double> mass, double lh,double lambda, double nu,
                     EOSBase* leos); //TODO: Test EOS
-    double get_density(Vec3<double> r);
-    Vec3<double> get_acceleration(int ipart);
+    double get_particle_density(int ipart); //< Density around a particle
+    double get_density(Vec3<double> ri); //< Density around a point
+    void update_acceleration();
     int get_nparticles();
     Particle* get_particle(int ipart);
+    void update_neighbour_table();
+    std::vector<std::vector<int>> get_neighbour_table();
+    std::vector<int> get_neighbour_table(int ipart);
+    
 };
 
 inline int ParticleSystem::get_nparticles(){return nparticles;};
 inline Particle* ParticleSystem::get_particle(int ipart){return &(sph_particles[ipart]); };
+inline std::vector<std::vector<int>> ParticleSystem::get_neighbour_table(){return neighbour_table;};
 #endif

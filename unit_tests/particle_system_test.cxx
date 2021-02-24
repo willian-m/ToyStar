@@ -70,10 +70,14 @@ BOOST_AUTO_TEST_CASE( acceleration_test ){
     
     double density_predicted = SPHMath::kernel_spline3D(Vec3<double>(0.,0.,0.), Vec3<double>(0.,0.,0.), h);
 
-    BOOST_CHECK_MESSAGE( abs(test_sys.get_acceleration(0).y) < TOL, "Non-zero acceleration on y commponent" );
-    BOOST_CHECK_MESSAGE( abs(test_sys.get_acceleration(0).z) < TOL, "Non-zero acceleration on z commponent" );
-    BOOST_CHECK_MESSAGE( abs(test_sys.get_acceleration(0).x + .5 + 6./(4.*M_PI)) < TOL, 
-                        "Wrong acceleration on x component. Got "<< test_sys.get_acceleration(0).x
+    test_sys.update_acceleration();
+
+    Vec3<double> acc = test_sys.get_particle(0)->get_acceleration();
+
+    BOOST_CHECK_MESSAGE( abs(acc.y) < TOL, "Non-zero acceleration on y commponent" );
+    BOOST_CHECK_MESSAGE( abs(acc.z) < TOL, "Non-zero acceleration on z commponent" );
+    BOOST_CHECK_MESSAGE( abs(acc.x + .5 + 6./(4.*M_PI)) < TOL, 
+                        "Wrong acceleration on x component. Got "<< acc.x
                         <<". It should be: " << -.5-3./(4.*M_PI) );
     
 
@@ -106,10 +110,14 @@ BOOST_AUTO_TEST_CASE( acceleration_test_2 ){
     
     double density_predicted = SPHMath::kernel_spline3D(Vec3<double>(0.,0.,0.), Vec3<double>(0.,0.,0.), h);
 
-    BOOST_CHECK_MESSAGE( abs(test_sys.get_acceleration(0).y) < TOL, "Non-zero acceleration on y commponent" );
-    BOOST_CHECK_MESSAGE( abs(test_sys.get_acceleration(0).z) < TOL, "Non-zero acceleration on z commponent" );
-    BOOST_CHECK_MESSAGE( abs(test_sys.get_acceleration(0).x + .5 + 6./(4.*M_PI)+1) < TOL, 
-                        "Wrong acceleration on x component. Got "<< test_sys.get_acceleration(0).x
+    test_sys.update_acceleration();
+    Vec3<double> acc = test_sys.get_particle(0)->get_acceleration();
+    
+
+    BOOST_CHECK_MESSAGE( abs(acc.y) < TOL, "Non-zero acceleration on y commponent" );
+    BOOST_CHECK_MESSAGE( abs(acc.z) < TOL, "Non-zero acceleration on z commponent" );
+    BOOST_CHECK_MESSAGE( abs(acc.x + .5 + 6./(4.*M_PI)+1) < TOL, 
+                        "Wrong acceleration on x component. Got "<< acc.x
                         <<". It should be: " << -.5-3./(4.*M_PI) );
     
 

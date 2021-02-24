@@ -29,6 +29,7 @@ BOOST_AUTO_TEST_CASE( harmonic_oscillator_test ){
 
     ParticleSystem current(r,v,m,.1,1.,.0,eos);
     ParticleSystem next(r,v,m,.1,1.,.0,eos);
+    ParticleSystem buffer(r,v,m,.1,1.,.0,eos);
 
     //Integrator parameters
     double total_time = 2.0*M_PI;
@@ -36,7 +37,7 @@ BOOST_AUTO_TEST_CASE( harmonic_oscillator_test ){
     double dt = total_time/nsteps;
     
     //Init integrator
-    IntegratorRK4 integrator(&current,&next,dt);
+    IntegratorRK4 integrator(&current,&next,&buffer,dt);
     
 
     for(int istep=0; istep<nsteps;++istep){
@@ -74,8 +75,9 @@ BOOST_AUTO_TEST_CASE( damped_harmonic_oscillator ){
     m.push_back(1.0);
 
 
-    ParticleSystem currents(r,v,m,.1,1.,1.0,eos);
-    ParticleSystem nexts(r,v,m,.1,1.,1.0,eos);
+    ParticleSystem current(r,v,m,.1,1.,1.0,eos);
+    ParticleSystem next(r,v,m,.1,1.,1.0,eos);
+    ParticleSystem buffer(r,v,m,.1,1.,1.0,eos);
 
     //Integrator parameters
     double total_time = 2.0*M_PI*20.;
@@ -83,7 +85,7 @@ BOOST_AUTO_TEST_CASE( damped_harmonic_oscillator ){
     double dt = total_time/nsteps;
     
     //Init integrator
-    IntegratorRK4 integrator(&currents,&nexts,dt);
+    IntegratorRK4 integrator(&current,&next,&buffer,dt);
     
     
     for(int istep=0; istep<nsteps;++istep){
@@ -91,14 +93,14 @@ BOOST_AUTO_TEST_CASE( damped_harmonic_oscillator ){
         integrator.update_system();
     }
     std::cout << std::endl;
-    std::cout << "Position deviation from expected: "<< std::setprecision(15) << abs(currents.get_particle(0)->get_x() ) << std::endl;
-    BOOST_CHECK_MESSAGE( abs(currents.get_particle(0)->get_x() ) < TOL,
-                        "Particle at position: "<<currents.get_particle(0)->get_x()<<
+    std::cout << "Position deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)->get_x() ) << std::endl;
+    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_x() ) < TOL,
+                        "Particle at position: "<<current.get_particle(0)->get_x()<<
                         ". Expected at 0.");
 
-        std::cout << "Velocity deviation from expected: "<< std::setprecision(15) << abs(currents.get_particle(0)->get_vx()) << std::endl;
-    BOOST_CHECK_MESSAGE( abs(currents.get_particle(0)->get_vx()) < TOL,
-                        "Particle with velocity: "<<currents.get_particle(0)->get_vx()<<
+        std::cout << "Velocity deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)->get_vx()) << std::endl;
+    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_vx()) < TOL,
+                        "Particle with velocity: "<<current.get_particle(0)->get_vx()<<
                         ". Expected it to be at rest.");
 
     
