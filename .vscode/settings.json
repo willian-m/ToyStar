@@ -5,10 +5,12 @@
     "cSpell.words": [
         "INTEGRATORRK",
         "SPHMATH",
+        "avrg",
         "ipart",
         "istep",
         "jpart",
         "jpoint",
+        "lbuffer",
         "lcurrent",
         "llambda",
         "lprevious",
@@ -103,7 +105,9 @@
         "locale": "cpp",
         "queue": "cpp",
         "semaphore": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "codecvt": "cpp",
+        "stack": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }
