@@ -97,3 +97,28 @@ BOOST_AUTO_TEST_CASE( kernel_spline3D_norm_test ){
                          "Interpolator does not normalize to 1. Value: "
                          << std::fixed << std::setprecision(15)<< sum*step*step*step);
 }
+
+BOOST_AUTO_TEST_CASE( gradient_kernel_spline3D ){
+
+    Vec3<double> ri(.0,.0,.0);
+    Vec3<double> rj(1.,.0,.0);
+
+    Vec3<double> spline_grad = SPHMath::gradient_kernel_spline3D(ri,rj,1);
+
+    BOOST_CHECK_MESSAGE( abs(spline_grad.x  + 3./(4.*M_PI)) < TOL,
+                    "Wrong value for x component of spline gradient. Expected "<< -3./(4.*M_PI)
+                    << ". Got " << spline_grad.x );
+    
+    rj.x = .0; rj.y = 1.;
+    spline_grad = SPHMath::gradient_kernel_spline3D(ri,rj,1);
+    BOOST_CHECK_MESSAGE( abs(spline_grad.y  + 3./(4.*M_PI)) < TOL,
+                    "Wrong value for y component of spline gradient. Expected "<< -3./(4.*M_PI)
+                    << ". Got " << spline_grad.y );
+
+    rj.y = .0; rj.z = 1.;
+    spline_grad = SPHMath::gradient_kernel_spline3D(ri,rj,1);
+    BOOST_CHECK_MESSAGE( abs(spline_grad.z  + 3./(4.*M_PI)) < TOL,
+                    "Wrong value for z component of spline gradient. Expected "<< -3./(4.*M_PI)
+                    << ". Got " << spline_grad.z );
+    
+}
