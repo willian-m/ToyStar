@@ -44,26 +44,38 @@ double ParticleSystem::get_particle_density(int ipart){
 
 void ParticleSystem::update_acceleration(){
 
-    update_neighbour_table();
+    //update_neighbour_table();
+    for (int ipart=0; ipart<nparticles;++ipart){
+        Vec3<double> ri = sph_particles[ipart].get_position();
+        Vec3<double> vi = sph_particles[ipart].get_velocity();
+        Vec3<double> acc = ri*(-1.*lambda)+vi*(-1.*nu);
+        sph_particles[ipart].set_acceleration(acc);
+    }
+
     for (int ipart=0; ipart<nparticles;++ipart){
         
         Vec3<double> ri = sph_particles[ipart].get_position();
-        Vec3<double> vi = sph_particles[ipart].get_velocity();
-        double rho_i = get_particle_density(ipart);
+        Vec3<double> acc_i = sph_particles[ipart].get_acceleration();
+
+        double rho_i = get_density(ri);
         double P_i = eos->get_pressure(rho_i);
         double p_over_rho2_i = P_i/(rho_i*rho_i);
 
-        Vec3<double> acc = ri*(-1.*lambda)+vi*(-1.*nu);
-        for (int jpart : neighbour_table[ipart]){
-            double m = sph_particles[jpart].get_mass();
+        for (int jpart=ipart+1; jpart<nparticles; ++jpart ){
             Vec3<double> rj = sph_particles[jpart].get_position();
-            double rho_j = get_particle_density(jpart);
+            Vec3<double> acc_j = sph_particles[jpart].get_acceleration();
+            double m = sph_particles[jpart].get_mass();
+            double rho_j = get_density(rj);
             double P_j = eos->get_pressure(rho_j);
             double p_over_rho2_j = P_j/(rho_j*rho_j);
             Vec3<double> gradient = SPHMath::gradient_kernel_spline3D(ri,rj,h);
-            acc = acc + gradient*(p_over_rho2_j+p_over_rho2_i)*(-1.*m);   
+            acc_i = acc_i + gradient*(p_over_rho2_j+p_over_rho2_i)*(-1.*m);
+            acc_j = acc_j + gradient*(p_over_rho2_j+p_over_rho2_i)*m;
+            sph_particles[jpart].set_acceleration(acc_j);
+            sph_particles[ipart].set_acceleration(acc_i);
         }
-        sph_particles[ipart].set_acceleration(acc);
+        
+        
     }
 }
 

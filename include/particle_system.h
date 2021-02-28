@@ -26,7 +26,7 @@ private:
 public:
     ParticleSystem(std::vector<Vec3<double>> r, std::vector<Vec3<double>> v, 
                    std::vector<double> mass, double lh,double lambda, double nu,
-                    EOSBase* leos); //TODO: Test EOS
+                    EOSBase* leos);
     double get_particle_density(int ipart); //< Density around a particle
     double get_density(Vec3<double> ri); //< Density around a point
     void update_acceleration();
