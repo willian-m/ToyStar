@@ -80,6 +80,7 @@ void IntegratorRK4::do_step(){
         particle_next->set_position(pos+avrg_vel*dt);
     }
     next_sys->update_acceleration(); //Estimation 2 for the system @ t+ dt
+    update_system();
 
 }
 
