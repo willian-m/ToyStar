@@ -13,6 +13,7 @@ protected:
     ParticleSystem* next_sys;
     double dt;
     int nparticles;
+    virtual void update_system() = 0;
 
 public:
     /*IntegratorBase(ParticleSystem* previous_sys,
@@ -25,7 +26,7 @@ public:
                    double dt);*/
 
     virtual void do_step() = 0; ///< Derived class must specify how to perform time-steps
-    virtual void update_system() = 0;
+    
 
     
 };
