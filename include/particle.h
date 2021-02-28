@@ -11,8 +11,6 @@ private:
     Vec3<double> v;      ///< Particle velocity
     Vec3<double> a;      ///< Particle acceleration
     double mass;         ///< Particle mass
-    double pressure;     ///< Pressure in the particle
-
 
 public:
 

@@ -21,7 +21,7 @@ Particle::Particle(double x, double y, double z, double vx, double vy, double vz
     a.z = az;
 
     this->mass = mass;
-    ///TODO: Init pressure
+
 }
 
 
@@ -30,7 +30,6 @@ Particle::Particle(Vec3<double> r_in, Vec3<double> v_in, Vec3<double> a_in, doub
     v = v_in;
     a = a_in;
     this->mass = mass;
-    ///TODO: Init pressure
 }
 
 
