@@ -12,18 +12,18 @@ int main(int argc, char* argv[]){
 
     //System parameters - initial positions
     const double L = .75;
-    const int nside = 8;
+    const int nside = 7;
     const double dL = L/nside;
 
     //System parameters
     const double star_mass = 2.;
     const double star_radius = .75;
     const double particle_mass = star_mass/pow(nside,3);
-    const double smoothing = 0.04/sqrt(pow(nside,3)/1000.);
-    const double damping = 1.;
+    const double smoothing = dL*1.8;//1.5*0.04/sqrt(pow(nside,3)/1000.);
+    const double damping = 10.;
 
     //Allocates eos
-    const double pressure_const = 0.1;
+    const double pressure_const = 1;
     const double poly_const = 1;
     EOSPolytropic* eos = new EOSPolytropic(pressure_const,poly_const);
 
@@ -31,8 +31,7 @@ int main(int argc, char* argv[]){
     const double fact1 = 2*pressure_const*(1+poly_const)*pow(M_PI,-3./(2*poly_const));
     const double fact2 = tgamma(5./2. + poly_const)*star_mass/(tgamma(1.+poly_const)*pow(star_radius,3));
     double lambda = fact1*pow(fact2,1./poly_const)/pow(star_radius,2);
-
-
+    lambda = 2.;
     //Creates particles
     std::vector<Vec3<double>> r;
     std::vector<Vec3<double>> v;
@@ -56,18 +55,37 @@ int main(int argc, char* argv[]){
     //anallytic solution to estimate how much time we must wait to get 
     //to the stationary solution 
 
-    double damping_time = 2./damping;
-
-
 
     //System parameters
-    const double total_time = 16;//damping_time*300;
+    const double total_time = 16;
     const int nsteps = 400;
     const double dt = total_time/nsteps;
 
+    //Print parameters
+    std::cout << "SPH parameters" << std::endl;
+    std::cout << "---------------------" << std::endl;
+    std::cout << "Number of particles..: " << pow(nside,3) << std::endl;
+    std::cout << "Particle mass........: " << particle_mass << std::endl;
+    std::cout << "Smoothing (h)........: " << smoothing << std::endl;
 
+    std::cout << "Star paramneters" << std::endl;
+    std::cout << "---------------------" << std::endl;
+    std::cout << "Damping..............: " << damping << std::endl;
+    std::cout << "Gravity..............: " << lambda << std::endl;
+    std::cout << "Star mass............: " << star_mass << std::endl;
+    std::cout << "Star radius..........: " << star_radius << std::endl;
 
+    
+    std::cout << "EOS parameters" << std::endl;
+    std::cout << "---------------------" << std::endl;
+    std::cout << "Pressure constant....: " << pressure_const << std::endl;
+    std::cout << "Polytropic constant..: " << poly_const << std::endl;
 
+    std::cout << "Simulation parameters" << std::endl;
+    std::cout << "---------------------" << std::endl;
+    std::cout << "Simulation time......: " << total_time << std::endl;
+    std::cout << "Number of steps......: " << nsteps << std::endl;
+    std::cout << "Step size............: " << dt << std::endl;
     //Init particle system
     ParticleSystem current(r,v,m,smoothing,lambda,damping,eos);
     ParticleSystem next(r,v,m,smoothing,lambda,damping,eos);
@@ -82,7 +100,33 @@ int main(int argc, char* argv[]){
         
         //Evolve the system
         integrator.do_step();
-        integrator.update_system();
+        //Iterate over particles, getting their position, velocity, mass and density
+        //Dump it in a text file
+
+        //a) Create filename
+        std::stringstream filename_stream;
+        filename_stream << "output_iter_" << istep << ".txt";
+        std::string filename;
+        filename_stream >> filename;
+
+        std::ofstream out_file(filename,std::ios::trunc);
+
+        //Dumps the data
+        if (out_file.is_open() && out_file.good()){
+            out_file << "# mass\tx\ty\tz\tvx\tvy\tvz\tdensity"<<std::endl;
+            int nparticles = current.get_nparticles();
+            for (int ipart=0; ipart<nparticles;++ipart){
+                Particle* p = current.get_particle(ipart);
+                double x = p->get_x(); double y = p->get_y(); double z = p->get_z();
+                out_file <<p->get_mass()<<"\t"
+                         <<x<<"\t"<<y<<"\t"<<z<<"\t"
+                         <<p->get_vx()<<"\t"<<p->get_vy()<<"\t"<<p->get_vz()<<"\t"
+                         <<current.get_density(Vec3<double>(x,y,z))<<std::endl;
+            }
+        }
+        out_file << std::flush;
+        out_file.close();
+
 
         if (istep%10 != 0) continue;
         //Progress bar: https://stackoverflow.com/a/14539953/2754579
@@ -98,25 +142,7 @@ int main(int argc, char* argv[]){
         std::cout.flush();
         
     }
-    std::cout << std::endl;
-    //Iterate over particles, getting their position, velocity, mass and density
-    //Dump it in a text file
-    std::ofstream out_file("output.txt",std::ios::trunc);
 
-    if (out_file.is_open() && out_file.good()){
-        out_file << "# mass\tx\ty\tz\tvx\tvy\tvz\tdensity"<<std::endl;
-        int nparticles = current.get_nparticles();
-        for (int ipart=0; ipart<nparticles;++ipart){
-            Particle* p = current.get_particle(ipart);
-            double x = p->get_x(); double y = p->get_y(); double z = p->get_z();
-            out_file <<p->get_mass()<<"\t"
-                     <<x<<"\t"<<y<<"\t"<<z<<"\t"
-                     <<p->get_vx()<<"\t"<<p->get_vy()<<"\t"<<p->get_vz()<<"\t"
-                     <<current.get_density(Vec3<double>(x,y,z))<<std::endl;
-        }
-    }
-    out_file << std::flush;
-    out_file.close();
     
 
     //In addition, gets the density at (z=0, y=0)
