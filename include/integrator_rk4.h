@@ -7,19 +7,25 @@
 #include "particle.h"
 #include "integrator_base.h"
 
-class IntegratorRK4 : public IntegratorBase{
+template <class T>
+class IntegratorRK4 : public IntegratorBase<T>{
 
 private:
 
-    ParticleSystem* buffer;
+    ParticleSystem<T>* buffer;
     void update_system();
     
 public:
 
-    IntegratorRK4(ParticleSystem* current, ParticleSystem* next, ParticleSystem* buffer, double dt);
+    IntegratorRK4(ParticleSystem<T>* current, 
+                  ParticleSystem<T>* next,
+                  ParticleSystem<T>* buffer, double dt);
     void do_step();
     
 
 };
+
+template class IntegratorRK4<Vec3>;
+template class IntegratorRK4<Vec2>;
 
 #endif

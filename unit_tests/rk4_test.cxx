@@ -13,36 +13,35 @@
 
 
 
-double get_kinetic_energy(ParticleSystem* sys){
+double get_kinetic_energy(ParticleSystem<Vec3>* sys){
     int npart =  sys->get_nparticles();
     double E = 0;
     for (int ipart=0; ipart<npart;++ipart){
-        Particle* particle = sys->get_particle(ipart);
-        Vec3<double> v = particle->get_velocity();
+        Particle<Vec3>* particle = sys->get_particle(ipart);
+        Vec3 v = particle->get_velocity();
         E += v.x*v.x + v.y*v.y + v.z*v.z;
     }
     return E;
 }
 
-double get_potential_energy(ParticleSystem* sys){
+double get_potential_energy(ParticleSystem<Vec3>* sys){
     int npart =  sys->get_nparticles();
     double E = 0;
     for (int ipart=0; ipart<npart;++ipart){
-        Particle* particle = sys->get_particle(ipart);
-        Vec3<double> v = particle->get_velocity();
-        Vec3<double> r = particle->get_position();
+        Particle<Vec3>* particle = sys->get_particle(ipart);
+        Vec3 r = particle->get_position();
         E += r.x*r.x + r.y*r.y + r.z*r.z;
     }
     return E;
 }
 
-double get_total_energy(ParticleSystem* sys){
+double get_total_energy(ParticleSystem<Vec3>* sys){
     int npart =  sys->get_nparticles();
     double E = 0;
     for (int ipart=0; ipart<npart;++ipart){
-        Particle* particle = sys->get_particle(ipart);
-        Vec3<double> v = particle->get_velocity();
-        Vec3<double> r = particle->get_position();
+        Particle<Vec3>* particle = sys->get_particle(ipart);
+        Vec3 v = particle->get_velocity();
+        Vec3 r = particle->get_position();
         E += v.x*v.x + v.y*v.y + v.z*v.z + r.x*r.x + r.y*r.y + r.z*r.z;
     }
     return E;
@@ -54,21 +53,21 @@ BOOST_AUTO_TEST_CASE( harmonic_oscillator_test ){
     //setup particle system
     EOSPolytropic* eos = new EOSPolytropic(1.,1.);
 
-    std::vector<Vec3<double>> r;
-    std::vector<Vec3<double>> v;
+    std::vector<Vec3> r;
+    std::vector<Vec3> v;
     std::vector<double> m;
 
-    Vec3<double> pos(1., .0, .0);
-    Vec3<double> vel(.0, .0, .0);
+    Vec3 pos(1., .0, .0);
+    Vec3 vel(.0, .0, .0);
 
     r.push_back(pos);
     v.push_back(vel);
     m.push_back(1.0);
 
 
-    ParticleSystem current(r,v,m,.1,1.,.0,eos);
-    ParticleSystem next(r,v,m,.1,1.,.0,eos);
-    ParticleSystem buffer(r,v,m,.1,1.,.0,eos);
+    ParticleSystem<Vec3> current(r,v,m,.1,1.,.0,eos);
+    ParticleSystem<Vec3> next(r,v,m,.1,1.,.0,eos);
+    ParticleSystem<Vec3> buffer(r,v,m,.1,1.,.0,eos);
 
     //Integrator parameters
     double total_time = 2.0*M_PI;
@@ -76,7 +75,7 @@ BOOST_AUTO_TEST_CASE( harmonic_oscillator_test ){
     double dt = total_time/nsteps;
     
     //Init integrator
-    IntegratorRK4 integrator(&current,&next,&buffer,dt);
+    IntegratorRK4<Vec3> integrator(&current,&next,&buffer,dt);
 
     std::ofstream total_E_file("Energy_HO_test.txt",std::ios::trunc);
     std::ofstream total_K_file("Kinetic_HO_test.txt",std::ios::trunc);
@@ -102,15 +101,15 @@ BOOST_AUTO_TEST_CASE( harmonic_oscillator_test ){
         total_K_file << istep*dt + dt <<"\t" << get_kinetic_energy(&current) << std::endl;
         total_pot_file << istep*dt + dt <<"\t" << get_potential_energy(&current) << std::endl;
         if ((istep == nsteps/4) || (istep == 3*nsteps/4)){
-            BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_x() ) < TOL*100,
-                        "Particle at position: "<<current.get_particle(0)->get_x()<<
+            BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_position().x ) < TOL*100,
+                        "Particle at position: "<<current.get_particle(0)-> get_position().x<<
                         ". Expected at 0.");
         } else if (istep == nsteps/2){
-            BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_x() + 1 ) < TOL*100,
-                        "Particle at position: "<<current.get_particle(0)->get_x()<<
+            BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_position().x + 1 ) < TOL*100,
+                        "Particle at position: "<<current.get_particle(0)-> get_position().x<<
                         ". Expected at -1.");
-            BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_vx()) < TOL*100,
-                        "Particle with velocity: "<<current.get_particle(0)->get_x()<<
+            BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_velocity().x) < TOL*100,
+                        "Particle with velocity: "<<current.get_particle(0)-> get_position().x<<
                         ". Expected at 0.");
         }
     }
@@ -120,14 +119,14 @@ BOOST_AUTO_TEST_CASE( harmonic_oscillator_test ){
     total_pot_file.close();
     total_K_file << std::flush;
     total_K_file.close();
-    std::cout << "Position deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)->get_x() - 1.) << std::endl;
-    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_x() - 1.) < TOL*100,
-                        "Particle at position: "<<current.get_particle(0)->get_x()<<
+    std::cout << "Position deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)-> get_position().x - 1.) << std::endl;
+    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_position().x - 1.) < TOL*100,
+                        "Particle at position: "<<current.get_particle(0)-> get_position().x<<
                         ". Expected at 1.");
 
-    std::cout << "Velocity deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)->get_vx()) << std::endl;
-    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_vx()) < TOL*100,
-                        "Particle with velocity: "<<current.get_particle(0)->get_vx()<<
+    std::cout << "Velocity deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)-> get_velocity().x) << std::endl;
+    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_velocity().x) < TOL*100,
+                        "Particle with velocity: "<<current.get_particle(0)-> get_velocity().x<<
                         ". Expected it to be at rest.");
 
     
@@ -138,21 +137,21 @@ BOOST_AUTO_TEST_CASE( damped_harmonic_oscillator ){
     //setup particle system
     EOSPolytropic* eos = new EOSPolytropic(1.,1.);
 
-    std::vector<Vec3<double>> r;
-    std::vector<Vec3<double>> v;
+    std::vector<Vec3> r;
+    std::vector<Vec3> v;
     std::vector<double> m;
 
-    Vec3<double> pos(2., .0, .0);
-    Vec3<double> vel(3., .0, .0);
+    Vec3 pos(2., .0, .0);
+    Vec3 vel(3., .0, .0);
 
     r.push_back(pos);
     v.push_back(vel);
     m.push_back(1.0);
 
 
-    ParticleSystem current(r,v,m,.1,1.,1.0,eos);
-    ParticleSystem next(r,v,m,.1,1.,1.0,eos);
-    ParticleSystem buffer(r,v,m,.1,1.,1.0,eos);
+    ParticleSystem<Vec3> current(r,v,m,.1,1.,1.0,eos);
+    ParticleSystem<Vec3> next(r,v,m,.1,1.,1.0,eos);
+    ParticleSystem<Vec3> buffer(r,v,m,.1,1.,1.0,eos);
 
     //Integrator parameters
     double total_time = 2.0*M_PI*20.;
@@ -160,21 +159,21 @@ BOOST_AUTO_TEST_CASE( damped_harmonic_oscillator ){
     double dt = total_time/nsteps;
     
     //Init integrator
-    IntegratorRK4 integrator(&current,&next,&buffer,dt);
+    IntegratorRK4<Vec3> integrator(&current,&next,&buffer,dt);
     
     
     for(int istep=0; istep<nsteps;++istep){
         integrator.do_step();
     }
     std::cout << std::endl;
-    std::cout << "Position deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)->get_x() ) << std::endl;
-    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_x() ) < TOL,
-                        "Particle at position: "<<current.get_particle(0)->get_x()<<
+    std::cout << "Position deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)-> get_position().x ) << std::endl;
+    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_position().x ) < TOL,
+                        "Particle at position: "<<current.get_particle(0)-> get_position().x<<
                         ". Expected at 0.");
 
-        std::cout << "Velocity deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)->get_vx()) << std::endl;
-    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_vx()) < TOL,
-                        "Particle with velocity: "<<current.get_particle(0)->get_vx()<<
+        std::cout << "Velocity deviation from expected: "<< std::setprecision(15) << abs(current.get_particle(0)-> get_velocity().x) << std::endl;
+    BOOST_CHECK_MESSAGE( abs(current.get_particle(0)->get_velocity().x) < TOL,
+                        "Particle with velocity: "<<current.get_particle(0)-> get_velocity().x<<
                         ". Expected it to be at rest.");
 
     
@@ -186,10 +185,10 @@ BOOST_AUTO_TEST_CASE( damped_harmonic_oscillator ){
 
     int const n_points = 10; //Test will generate this many random points.
                              //The distance between them should always be positive
-    std::vector<Vec3<double>> pos1, vel1;
-    std::vector<Vec3<double>> pos2, vel2;
+    std::vector<Vec3> pos1, vel1;
+    std::vector<Vec3> pos2, vel2;
     std::vector<double> mass1, mass2;
-    Vec3<double> pos, vel;
+    Vec3 pos, vel;
 
 
     std::srand(8270509);
@@ -217,9 +216,9 @@ BOOST_AUTO_TEST_CASE( damped_harmonic_oscillator ){
         mass2.push_back(mass);
     }
 
-    ParticleSystem current(pos1,vel1,mass1,.05,1.,0.,eos);
-    ParticleSystem next(pos2,vel2,mass2,.05,1.,0.,eos);
-    ParticleSystem buffer(pos2,vel2,mass2,.05,1.,0.,eos);
+    ParticleSystem<Vec3> current(pos1,vel1,mass1,.05,1.,0.,eos);
+    ParticleSystem<Vec3> next(pos2,vel2,mass2,.05,1.,0.,eos);
+    ParticleSystem<Vec3> buffer(pos2,vel2,mass2,.05,1.,0.,eos);
 
     std::cout << &current <<"," <<&next<<std::endl;
     
@@ -230,9 +229,9 @@ BOOST_AUTO_TEST_CASE( damped_harmonic_oscillator ){
     
     //Check if we swapped the systems
     for (int ipart=0;ipart<n_points;++ipart){
-        Particle* next_part = next.get_particle(ipart);
-        BOOST_CHECK_MESSAGE( next_part->get_x() == pos1[ipart].x,
-            "Wrong particle position in x direction. Expected "<<pos1[ipart].x<<". Received: "<<next_part->get_x());
+        Particle<Vec3>* next_part = next.get_particle(ipart);
+        BOOST_CHECK_MESSAGE( next_part-> get_position().x == pos1[ipart].x,
+            "Wrong particle position in x direction. Expected "<<pos1[ipart].x<<". Received: "<<next_part-> get_position().x);
         BOOST_CHECK_MESSAGE( next_part->get_y() == pos1[ipart].y,
             "Wrong particle position in y direction. Expected "<<pos1[ipart].y<<". Received: "<<next_part->get_y());
         BOOST_CHECK_MESSAGE( next_part->get_z() == pos1[ipart].z,

@@ -5,30 +5,23 @@
 
 #include "particle_system.h"
 
+template <class T>
 class IntegratorBase{
 
 protected:
-    ParticleSystem* previous_sys;
-    ParticleSystem* current_sys;
-    ParticleSystem* next_sys;
+    ParticleSystem<T>* previous_sys;
+    ParticleSystem<T>* current_sys;
+    ParticleSystem<T>* next_sys;
     double dt;
     int nparticles;
     virtual void update_system() = 0;
 
 public:
-    /*IntegratorBase(ParticleSystem* previous_sys,
-                   ParticleSystem* current_sys,
-                   ParticleSystem* next_sys,
-                   double dt);
-
-    IntegratorBase(ParticleSystem* current_sys,
-                   ParticleSystem* next_sys,
-                   double dt);*/
-
+    
     virtual void do_step() = 0; ///< Derived class must specify how to perform time-steps
-    
-
-    
 };
+
+template class IntegratorBase<Vec3>;
+template class IntegratorBase<Vec2>;
 
 #endif

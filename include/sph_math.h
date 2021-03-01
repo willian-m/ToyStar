@@ -11,13 +11,18 @@ class SPHMath{
 private:
     SPHMath();
     const static double norm3D;
+    const static double norm2D;
 
 public:
     
-    static double kernel_spline3D(Vec3<double> ri, Vec3<double> rj, double h);
-    static double kernel_spline3D(double distance, double h); //TODO: Implement test
-    static double distance(Vec3<double> ri, Vec3<double> rj);
-    static Vec3<double> gradient_kernel_spline3D(Vec3<double> ri, Vec3<double> rj, double h);
+    static double kernel_spline(Vec3 ri, Vec3 rj, double h);
+    static double kernel_spline(Vec2 ri, Vec2 rj, double h);
+    static double kernel_spline3D(double distance, double h);
+    static double kernel_spline2D(double distance, double h);
+    static double distance(Vec3 ri, Vec3 rj);
+    static double distance(Vec2 ri, Vec2 rj);
+    static Vec3 gradient_kernel_spline(Vec3 ri, Vec3 rj, double h);
+    static Vec2 gradient_kernel_spline(Vec2 ri, Vec2 rj, double h);
 
 };
 

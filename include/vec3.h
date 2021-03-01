@@ -1,27 +1,19 @@
 #ifndef VEC3_H
 #define VEC3_H
 
-#include <complex>
+#include "vec2.h"
 
-template<class T>
-class Vec3{
+class Vec3 : public Vec2 {
 
 public:
-    T x; ///< x coordinate of the vector
-    T y; ///< y coordinate of the vector
-    T z; ///< z coordinate of the vector
+    double z; ///< z coordinate of the vector
 
     Vec3();
-    Vec3(T x, T y, T z);
-    Vec3<T> operator* (double x);
-    Vec3<T> operator+ (const Vec3<T> v);
+    Vec3(double x, double y, double z);
+    Vec3 operator* (double x);
+    Vec3 operator+ (const Vec3 v);
 };
 
-//Allowed values of the template
-template class Vec3<int>;
-template class Vec3<float>;
-template class Vec3<double>;
-template class Vec3<std::complex<double>>;
-
+inline Vec3 operator* (double x, Vec3 v){ return v*x; };
 
 #endif

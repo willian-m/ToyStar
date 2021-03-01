@@ -6,7 +6,7 @@
  A class to store SPH particle properties. There is no dynamic in here
 */
 
-Particle::Particle(double x, double y, double z, double vx, double vy, double vz, double ax, double ay, double az, double mass){
+/*Particle::Particle(double x, double y, double z, double vx, double vy, double vz, double ax, double ay, double az, double mass){
 
     r.x = x;
     r.y = y;
@@ -22,10 +22,10 @@ Particle::Particle(double x, double y, double z, double vx, double vy, double vz
 
     this->mass = mass;
 
-}
+}*/
 
-
-Particle::Particle(Vec3<double> r_in, Vec3<double> v_in, Vec3<double> a_in, double mass){
+template <class T>
+Particle<T>::Particle(T r_in, T v_in, T a_in, double mass){
     r = r_in;
     v = v_in;
     a = a_in;
@@ -34,7 +34,7 @@ Particle::Particle(Vec3<double> r_in, Vec3<double> v_in, Vec3<double> a_in, doub
 
 
 
-void Particle::set_position(double x, double y, double z){
+/*void Particle::set_position(double x, double y, double z){
     r.x = x;
     r.y = y;
     r.z = z;
@@ -52,4 +52,4 @@ void Particle::set_acceleration(double ax, double ay, double az){
     a.x = ax;
     a.y = ay;
     a.z = az;
-}
+}*/

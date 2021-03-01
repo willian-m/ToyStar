@@ -18,6 +18,7 @@ set(particle_test_exe "particle_test.exe")
 #Configure build
 add_executable("${vec3_test_exe}" vec3_test)
 target_link_libraries (${vec3_test_exe} 
+                       vec2 
                        vec3
                        ${Boost_FILESYSTEM_LIBRARY}
                        ${Boost_SYSTEM_LIBRARY}
@@ -25,7 +26,8 @@ target_link_libraries (${vec3_test_exe}
                        )
 
 add_executable("${particle_test_exe}" particle_test)
-target_link_libraries (${particle_test_exe} 
+target_link_libraries (${particle_test_exe}
+                       vec2
                        vec3
                        particle
                        ${Boost_FILESYSTEM_LIBRARY}
@@ -34,7 +36,8 @@ target_link_libraries (${particle_test_exe}
                        )
 
 add_executable("${sph_math_test_exe}" sph_math_test)
-target_link_libraries (${sph_math_test_exe} 
+target_link_libraries (${sph_math_test_exe}
+                       vec2 
                        vec3
                        sph_math
                        ${Boost_FILESYSTEM_LIBRARY}
@@ -44,6 +47,7 @@ target_link_libraries (${sph_math_test_exe}
 
 add_executable("${particle_system_test_exe}" particle_system_test)
 target_link_libraries (${particle_system_test_exe}
+                       vec2
                        sph_math
                        eos_polytropic
                        particle
@@ -56,6 +60,7 @@ target_link_libraries (${particle_system_test_exe}
 
 add_executable("${rk4_test_exe}" rk4_test)
 target_link_libraries (${rk4_test_exe}
+                       vec2
                        sph_math
                        eos_polytropic
                        particle

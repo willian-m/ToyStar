@@ -33,11 +33,11 @@ int main(int argc, char* argv[]){
     double lambda = fact1*pow(fact2,1./poly_const)/pow(star_radius,2);
     lambda = 2.;
     //Creates particles
-    std::vector<Vec3<double>> r;
-    std::vector<Vec3<double>> v;
+    std::vector<Vec3> r;
+    std::vector<Vec3> v;
     std::vector<double> m;
-    Vec3<double> pos(.0, .0, .0);
-    Vec3<double> vel(.0, .0, .0);
+    Vec3 pos(.0, .0, .0);
+    Vec3 vel(.0, .0, .0);
     for (int ix = 0; ix<nside; ++ix){
         pos.x = -L/2 + ix*dL;
         for (int iy = 0; iy<nside; ++iy){
@@ -87,12 +87,12 @@ int main(int argc, char* argv[]){
     std::cout << "Number of steps......: " << nsteps << std::endl;
     std::cout << "Step size............: " << dt << std::endl;
     //Init particle system
-    ParticleSystem current(r,v,m,smoothing,lambda,damping,eos);
-    ParticleSystem next(r,v,m,smoothing,lambda,damping,eos);
-    ParticleSystem buffer(r,v,m,smoothing,lambda,damping,eos);
+    ParticleSystem<Vec3> current(r,v,m,smoothing,lambda,damping,eos);
+    ParticleSystem<Vec3> next(r,v,m,smoothing,lambda,damping,eos);
+    ParticleSystem<Vec3> buffer(r,v,m,smoothing,lambda,damping,eos);
 
     //Init integrator
-    IntegratorRK4 integrator(&current,&next,&buffer,dt);
+    IntegratorRK4<Vec3> integrator(&current,&next,&buffer,dt);
     
     //Simulate it!    
     int barWidth = 70; //Width of progress bar
@@ -116,12 +116,14 @@ int main(int argc, char* argv[]){
             out_file << "# mass\tx\ty\tz\tvx\tvy\tvz\tdensity"<<std::endl;
             int nparticles = current.get_nparticles();
             for (int ipart=0; ipart<nparticles;++ipart){
-                Particle* p = current.get_particle(ipart);
-                double x = p->get_x(); double y = p->get_y(); double z = p->get_z();
+                Particle<Vec3>* p = current.get_particle(ipart);
+                Vec3 pos = p->get_position();
+                Vec3 vel = p->get_velocity();
+                double x = pos.x; double y = pos.y; double z = pos.z;
                 out_file <<p->get_mass()<<"\t"
                          <<x<<"\t"<<y<<"\t"<<z<<"\t"
-                         <<p->get_vx()<<"\t"<<p->get_vy()<<"\t"<<p->get_vz()<<"\t"
-                         <<current.get_density(Vec3<double>(x,y,z))<<std::endl;
+                         <<vel.x<<"\t"<<vel.y<<"\t"<<vel.z<<"\t"
+                         <<current.get_density(Vec3(x,y,z))<<std::endl;
             }
         }
         out_file << std::flush;
@@ -155,7 +157,7 @@ int main(int argc, char* argv[]){
         int const nr = max_r/dr;
         for (int ir=0; ir<nr;++ir){
             double r = ir*dr;
-            out_density <<r<<"\t"<<current.get_density(Vec3<double>(r,0,0))<<std::endl;
+            out_density <<r<<"\t"<<current.get_density(Vec3(r,0,0))<<std::endl;
         }
     }
     out_density << std::flush;
