@@ -38,7 +38,8 @@ add_subdirectory (unit_tests)
 
 
 add_executable(ToyStar.exe src/ToyStar)
-target_link_libraries (ToyStar.exe 
+target_link_libraries (ToyStar.exe
+                       vec2
                        sph_math
                        eos_polytropic
                        particle

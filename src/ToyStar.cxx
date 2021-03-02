@@ -11,15 +11,16 @@
 int main(int argc, char* argv[]){
 
     //System parameters - initial positions
-    const double L = .75;
-    const int nside = 7;
+    const double L = 2*.75;
+    const int nside = 8;
     const double dL = L/nside;
 
     //System parameters
     const double star_mass = 2.;
     const double star_radius = .75;
     const double particle_mass = star_mass/pow(nside,3);
-    const double smoothing = dL*1.8;//1.5*0.04/sqrt(pow(nside,3)/1000.);
+    //const double smoothing = 0.04/sqrt(pow(nside,3)/1000.);
+    const double smoothing = dL;//*1.8;//1.5*0.04/sqrt(pow(nside,3)/1000.);
     const double damping = 10.;
 
     //Allocates eos
@@ -31,7 +32,12 @@ int main(int argc, char* argv[]){
     const double fact1 = 2*pressure_const*(1+poly_const)*pow(M_PI,-3./(2*poly_const));
     const double fact2 = tgamma(5./2. + poly_const)*star_mass/(tgamma(1.+poly_const)*pow(star_radius,3));
     double lambda = fact1*pow(fact2,1./poly_const)/pow(star_radius,2);
-    lambda = 2.;
+    
+    //System evolution parameters
+    const double total_time = 16;
+    const int nsteps = 400;
+    const double dt = total_time/nsteps;
+
     //Creates particles
     std::vector<Vec3> r;
     std::vector<Vec3> v;
@@ -54,12 +60,6 @@ int main(int argc, char* argv[]){
     //Each particle behaves as an damped HO. We use our knowledge of the 
     //anallytic solution to estimate how much time we must wait to get 
     //to the stationary solution 
-
-
-    //System parameters
-    const double total_time = 16;
-    const int nsteps = 400;
-    const double dt = total_time/nsteps;
 
     //Print parameters
     std::cout << "SPH parameters" << std::endl;
@@ -86,6 +86,7 @@ int main(int argc, char* argv[]){
     std::cout << "Simulation time......: " << total_time << std::endl;
     std::cout << "Number of steps......: " << nsteps << std::endl;
     std::cout << "Step size............: " << dt << std::endl;
+
     //Init particle system
     ParticleSystem<Vec3> current(r,v,m,smoothing,lambda,damping,eos);
     ParticleSystem<Vec3> next(r,v,m,smoothing,lambda,damping,eos);
