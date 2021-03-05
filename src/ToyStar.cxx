@@ -2,6 +2,7 @@
 #include <math.h> //Gamma function
 #include <iostream>
 #include <fstream>
+#include <ctime>
 
 #include "eos_polytropic.h"
 #include "vec3.h"
@@ -166,6 +167,7 @@ void EvolveIt(ToyStarPars pars, std::vector<T>* r, std::vector<T>* v,   std::vec
 
     //Simulate it!    
     int barWidth = 70; //Width of progress bar
+    const clock_t begin_time = clock();
     for(int istep=0; istep<pars.nsteps;++istep){
 
         //Evolve the system
@@ -173,6 +175,20 @@ void EvolveIt(ToyStarPars pars, std::vector<T>* r, std::vector<T>* v,   std::vec
         //Iterate over particles, getting their position, velocity, mass and density
         //Dump it in a text file
 
+        //Progress bar: https://stackoverflow.com/a/14539953/2754579
+        float progress = (double) istep/(double) pars.nsteps;
+        float time_from_start = float( clock () - begin_time ) /  CLOCKS_PER_SEC;
+        float avrg_perf = progress/time_from_start;
+        float time_ramaining = (1.-progress)/avrg_perf;
+        std::cout << "[";
+        int bpos = barWidth * progress;
+        for (int i = 0; i < barWidth; ++i) {
+            if (i < bpos) std::cout << "=";
+            else if (i == bpos) std::cout << ">";
+            else std::cout << " ";
+        }
+        std::cout << "] " << int(progress * 100.0) << " %. Remaining: "<< time_ramaining/60<<" min\r";
+        std::cout.flush();
         if (istep%10 != 0) continue;
         //Create filename
         std::stringstream filename_stream;
@@ -182,18 +198,7 @@ void EvolveIt(ToyStarPars pars, std::vector<T>* r, std::vector<T>* v,   std::vec
 
         //Print output
         PrintParticleSystem(&current, filename);
-        
-        //Progress bar: https://stackoverflow.com/a/14539953/2754579
-        float progress = (double) istep/(double) pars.nsteps;
-        std::cout << "[";
-        int bpos = barWidth * progress;
-        for (int i = 0; i < barWidth; ++i) {
-            if (i < bpos) std::cout << "=";
-            else if (i == bpos) std::cout << ">";
-            else std::cout << " ";
-        }
-        std::cout << "] " << int(progress * 100.0) << " %\r";
-        std::cout.flush();
+
     }
     PrintDensityAlongX(&current,"density.txt");
 }
