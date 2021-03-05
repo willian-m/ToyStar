@@ -106,7 +106,7 @@ Vec2 SPHMath::gradient_kernel_spline(Vec2 ri, Vec2 rj, double h){
     if (d < TOL) return Vec3(.0,.0,.0); //Avoid division by 0 at the origin
 
     double q = d/h;
-    double norm = norm2D/std::pow(h,4);
+    double norm = norm2D/std::pow(h,3);
     
     double del_W_del_r = .0;
 
