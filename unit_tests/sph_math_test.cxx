@@ -105,19 +105,19 @@ BOOST_AUTO_TEST_CASE( gradient_kernel_spline3D ){
 
     Vec3 spline_grad = SPHMath::gradient_kernel_spline(ri,rj,1);
 
-    BOOST_CHECK_MESSAGE( abs(spline_grad.x  + 3./(4.*M_PI)) < TOL,
+    BOOST_CHECK_MESSAGE( abs(spline_grad.x  - 3./(4.*M_PI)) < TOL,
                     "Wrong value for x component of spline gradient. Expected "<< -3./(4.*M_PI)
                     << ". Got " << spline_grad.x );
     
     rj.x = .0; rj.y = 1.;
     spline_grad = SPHMath::gradient_kernel_spline(ri,rj,1);
-    BOOST_CHECK_MESSAGE( abs(spline_grad.y  + 3./(4.*M_PI)) < TOL,
+    BOOST_CHECK_MESSAGE( abs(spline_grad.y  - 3./(4.*M_PI)) < TOL,
                     "Wrong value for y component of spline gradient. Expected "<< -3./(4.*M_PI)
                     << ". Got " << spline_grad.y );
 
     rj.y = .0; rj.z = 1.;
     spline_grad = SPHMath::gradient_kernel_spline(ri,rj,1);
-    BOOST_CHECK_MESSAGE( abs(spline_grad.z  + 3./(4.*M_PI)) < TOL,
+    BOOST_CHECK_MESSAGE( abs(spline_grad.z  - 3./(4.*M_PI)) < TOL,
                     "Wrong value for z component of spline gradient. Expected "<< -3./(4.*M_PI)
                     << ". Got " << spline_grad.z );
     
