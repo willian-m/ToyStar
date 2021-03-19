@@ -46,6 +46,7 @@ public:
     double get_density(T ri); //< Density around a point
     void update_acceleration();
     int get_nparticles();
+    double get_h();
     Particle<T>* get_particle(int ipart);
 
     
@@ -59,6 +60,9 @@ inline int ParticleSystem<T>::get_nparticles(){return nparticles;};
 
 template <class T>
 inline Particle<T>* ParticleSystem<T>::get_particle(int ipart){return &(sph_particles[ipart]); };
+template <class T>
+inline double ParticleSystem<T>::get_h(){return h;};
+
 
 template class ParticleSystem<Vec3>;
 template class ParticleSystem<Vec2>;

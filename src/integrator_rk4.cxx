@@ -79,6 +79,8 @@ void IntegratorRK4<T>::do_step(){
 
         particle_next->set_velocity(vel+avrg_acc*this->dt);
         particle_next->set_position(pos+avrg_vel*this->dt);
+        if (SPHMath::distance(particle_current->get_position(),particle_next->get_position()) > this->current_sys->get_h())
+            std::cout << "WARNING: Particle displacement bigger than smoothing length." << std::endl;
     }
     this->next_sys->update_acceleration(); //Estimation 2 for the system @ t+ dt
     update_system();

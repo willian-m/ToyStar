@@ -2,6 +2,7 @@
 #define INTEGRATORRK4_H
 
 #include <array>
+#include <iostream>
 
 #include "vec3.h"
 #include "particle.h"
