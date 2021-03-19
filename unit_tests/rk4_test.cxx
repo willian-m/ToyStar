@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE( harmonic_oscillator_test ){
 
     //Integrator parameters
     double total_time = 2.0*M_PI;
-    int nsteps = 100000;
+    int nsteps = 10000;
     double dt = total_time/nsteps;
     
     //Init integrator
