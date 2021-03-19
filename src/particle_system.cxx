@@ -146,22 +146,22 @@ void ParticleSystem<T>::clear_grid(){
 /// Fills the particles neighbor list 
 template <class T>
 void ParticleSystem<T>::find_neighbor_particles(){
-    for(Cell<T> cell : grid ){ //Loop over cells in the grid
-        auto ipart = cell.particle_list.begin();
-        while (ipart != cell.particle_list.end() ){ //Loop over particles in the cell
+    for(auto it_cell = grid.begin(); it_cell != grid.end(); ++it_cell ){ //Loop over cells in the grid
+        auto ipart = it_cell->particle_list.begin();
+        while (ipart != it_cell->particle_list.end() ){ //Loop over particles in the cell
             T ipart_pos = (*ipart)->get_position();
             // 1) Loop over other particles in the cell
-            for (Particle<T>* jpart : cell.particle_list ){
+            for (Particle<T>* jpart : it_cell->particle_list ){
                 //a) Compute distance between ipart and jpart
                 double d = SPHMath::distance(ipart_pos,jpart->get_position());
                 //b) If distance < 2h, set particles as neighbors
-                if (d < 2*h ) {
+                if (d < 2*h && d > 1.E-14) {
                     (*ipart)->add_neighbour_particle(jpart,d);
                     jpart->add_neighbour_particle((*ipart),d);
                 }
             }
             // 2) Loop over particles in neighbour cells
-            for (int neighbour_cell_idx : cell.neighbour_cell_list){ 
+            for (int neighbour_cell_idx : it_cell->neighbour_cell_list){ 
                 //      neighbour_cell !=  cell.neighbour_cell_list.end(); ++neighbour_cell ){
                 for (Particle<T>* jpart : grid[neighbour_cell_idx].particle_list ){
                     //a) Compute distance between ipart and jpart
@@ -185,7 +185,7 @@ void ParticleSystem<T>::find_neighbor_particles(){
                 }*/
             }
             // 3) Remove particle from the cell, to avoid looking into it again
-            ipart = cell.particle_list.erase(ipart); // This already update to look at next particle
+            ipart = it_cell->particle_list.erase(ipart); // This already update to look at next particle
         }
         // TODO: 4) Look at neighbouring cells and remove the current one from its neighbour lists
         // Not critical, since the cell should be empty by now
