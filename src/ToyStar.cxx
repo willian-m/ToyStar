@@ -187,7 +187,7 @@ void EvolveIt(ToyStarPars pars, std::vector<T>* r, std::vector<T>* v,   std::vec
             else if (i == bpos) std::cout << ">";
             else std::cout << " ";
         }
-        std::cout << "] " << int(progress * 100.0) << " %. Remaining: "<< time_ramaining/60<<" min\r";
+        std::cout << "] " << int(progress * 100.0) << " % ("<<istep<<"/"<<pars.nsteps<<"). Remaining: "<< time_ramaining/60<<" min\r";
         std::cout.flush();
         if (istep%10 != 0) continue;
         //Create filename

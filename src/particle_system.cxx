@@ -47,13 +47,22 @@ double ParticleSystem<T>::get_particle_density(int ipart){
 template <class T>
 void ParticleSystem<T>::update_acceleration(){
 
-    //update_neighbour_table();
+    clear_grid();
+
     for (int ipart=0; ipart<nparticles;++ipart){
         T ri = sph_particles[ipart].get_position();
         T vi = sph_particles[ipart].get_velocity();
         T acc = (-1.)*lambda*ri+(-1.)*nu*vi;
         sph_particles[ipart].set_acceleration(acc);
+        sph_particles[ipart].clear_neighbors(); //Clear list of neighbors
     }
+
+    //Setup grid
+    //TODO: Implement switch from 2D and 3D grids
+    //TODO: Implement Interface to decide grid boundaries
+    setup_grid(Vec3(-1,-1,-1),Vec3(1,1,1));
+    find_neighbor_particles();
+
 
     for (int ipart=0; ipart<nparticles;++ipart){
         
@@ -64,10 +73,12 @@ void ParticleSystem<T>::update_acceleration(){
         double P_i = eos->get_pressure(rho_i);
         double p_over_rho2_i = P_i/(rho_i*rho_i);
 
-        for (int jpart=ipart+1; jpart<nparticles; ++jpart ){
-            T rj = sph_particles[jpart].get_position();
-            T acc_j = sph_particles[jpart].get_acceleration();
-            double m = sph_particles[jpart].get_mass();
+        int num_neighbors = sph_particles[ipart].get_num_neighbors();
+        for (int jpart=ipart+1; jpart<num_neighbors; ++jpart ){
+            Particle<T>* neigh_part = sph_particles[ipart].get_neighbor(jpart);
+            T rj = neigh_part->get_position();
+            T acc_j = neigh_part->get_acceleration();
+            double m = neigh_part->get_mass();
             double rho_j = get_density(rj);
             double P_j = eos->get_pressure(rho_j);
             double p_over_rho2_j = P_j/(rho_j*rho_j);
@@ -89,4 +100,173 @@ double ParticleSystem<T>::get_density(T ri){
                    *SPHMath::kernel_spline(ri,sph_particles[jpart].get_position(),h);
     }
     return density;
+}
+
+template <class T>
+void ParticleSystem<T>::setup_grid(Vec3 grid_min, Vec3 grid_max){
+    double grid_step = 2*h;
+    nx = (int) round((grid_max.x-grid_min.x)/grid_step);
+    ny = (int) round((grid_max.y-grid_min.y)/grid_step);
+    
+    lim_x[0] = grid_min.x;
+    lim_y[0] = grid_min.y;
+
+    lim_x[1] = (nx-1)*grid_step;
+    lim_y[1] = (ny-1)*grid_step;
+
+    if (typeid(Vec3) == typeid(T) ){
+        nz = (int) round((grid_max.z-grid_min.z)/grid_step);
+        lim_z[0] = grid_min.z;
+        lim_z[1] = (nz-1)*grid_step;
+    } else {
+        nz = 1;
+        lim_z[0] = .0;
+        lim_z[1] = .0;
+    }
+    ncells = nx*ny*nz;
+
+
+    //Init grid with empty cells
+    grid = std::vector<Cell<T>>();
+    grid.reserve(ncells);
+    //Fill it with empty cells
+    for (int icell=0; icell<ncells;++icell) grid.emplace_back(Cell<T>(icell));
+    build_cell_neighbour_list();
+    add_particles_to_grid();
+}
+
+template <class T>
+void ParticleSystem<T>::clear_grid(){
+    for(auto icell = grid.begin(); icell != grid.end(); ++icell){
+        icell->clear_cell();
+    }
+    grid.clear();
+}
+
+/// Fills the particles neighbor list 
+template <class T>
+void ParticleSystem<T>::find_neighbor_particles(){
+    for(Cell<T> cell : grid ){ //Loop over cells in the grid
+        auto ipart = cell.particle_list.begin();
+        while (ipart != cell.particle_list.end() ){ //Loop over particles in the cell
+            T ipart_pos = (*ipart)->get_position();
+            // 1) Loop over other particles in the cell
+            for (Particle<T>* jpart : cell.particle_list ){
+                //a) Compute distance between ipart and jpart
+                double d = SPHMath::distance(ipart_pos,jpart->get_position());
+                //b) If distance < 2h, set particles as neighbors
+                if (d < 2*h ) {
+                    (*ipart)->add_neighbour_particle(jpart,d);
+                    jpart->add_neighbour_particle((*ipart),d);
+                }
+            }
+            // 2) Loop over particles in neighbour cells
+            for (int neighbour_cell_idx : cell.neighbour_cell_list){ 
+                //      neighbour_cell !=  cell.neighbour_cell_list.end(); ++neighbour_cell ){
+                for (Particle<T>* jpart : grid[neighbour_cell_idx].particle_list ){
+                    //a) Compute distance between ipart and jpart
+                    double d = SPHMath::distance(ipart_pos,jpart->get_position());
+                    //b) If distance < 2h, set particles as neighbors
+                    if (d < 2*h ) {
+                        (*ipart)->add_neighbour_particle(jpart,d);
+                        jpart->add_neighbour_particle((*ipart),d);
+                    }
+                }
+                /*for ( auto jpart = (*neighbour_cell)->particle_list.begin();
+                           jpart != (*neighbour_cell)->particle_list.end(); ++jpart ){
+
+                    //a) Compute distance between ipart and jpart
+                    double d = SPHMath::distance(ipart_pos,(*jpart)->get_position());
+                    //b) If distance < 2h, set particles as neighbors
+                    if (d < 2*h ) {
+                        (*ipart)->add_neighbour_particle((*jpart),d);
+                        (*jpart)->add_neighbour_particle((*ipart),d);
+                    }
+                }*/
+            }
+            // 3) Remove particle from the cell, to avoid looking into it again
+            ipart = cell.particle_list.erase(ipart); // This already update to look at next particle
+        }
+        // TODO: 4) Look at neighbouring cells and remove the current one from its neighbour lists
+        // Not critical, since the cell should be empty by now
+    }
+}
+
+/// Returns the cell index of a point of the grid
+template<class T>
+int ParticleSystem<T>::get_grid_idx(Vec2 r){
+    int ix = (int) ((r.x-lim_x[0])*nx/(lim_x[1]-lim_x[0]));
+    ix = ix < 0 ? 0 : (ix >= nx ? nx-1 : ix);
+
+    int iy = (int) ((r.y-lim_y[0])*ny/(lim_y[1]-lim_y[0]));
+    iy = iy < 0 ? 0 : (iy >= ny ? ny-1 : iy);
+    
+    return ix + iy*nx;
+}
+
+/// Returns the cell index of a point of the grid
+template<class T>
+int ParticleSystem<T>::get_grid_idx(Vec3 r){
+
+    int iz = (int) ((r.z-lim_z[0])*nz/(lim_z[1]-lim_z[0]));
+    iz = iz < 0 ? 0 : (iz >= nz ? nz-1 : iz);
+
+    return iz*nx*ny + get_grid_idx(Vec2(r.x,r.y));
+}
+
+/// Organize the particles inside the grid
+template <class T>
+void ParticleSystem<T>::add_particles_to_grid(){
+    for (auto part = sph_particles.begin(); part != sph_particles.end(); ++part){
+        int particle_grid_pos = get_grid_idx( (*part).get_position());
+        grid[particle_grid_pos].particle_list.emplace_back(&(*part));
+    }
+}
+
+/// Fills the neighbour list of the cells
+template <class T>
+void ParticleSystem<T>::build_cell_neighbour_list(){
+    for (int iz = 0; iz<nz; ++iz){
+        int iz_plus  = (iz+1 - ((1 + iz)/nz)*nz)*nx*ny;
+        int iz_minus = (iz-1 + ((nz - iz)/nz)*nz)*nx*ny;
+        int idx_z = iz*nx*ny;
+        for (int iy = 0; iy<ny; ++iy){
+            int iy_plus  = (iy+1 - ((1 + iy)/ny)*ny)*nx;
+            int iy_minus = (iy-1 + ((ny - iy)/ny)*ny)*nx;
+            int idx_y = iy*nx;
+            for (int ix = 0; ix<nx; ++ix){
+                int ix_plus  = ix+1 - ((1 + ix)/nx)*nx;
+                int ix_minus = ix-1 + ((nx - ix)/nx)*nx;
+                int idx_x = ix;
+                int current_cell_idx = idx_z + idx_y + idx_x;
+                
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_minus + ix_minus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_minus + idx_x );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_minus + ix_plus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + ix_minus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + idx_x );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + ix_plus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + ix_minus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + idx_x );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + ix_plus );
+                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_minus + ix_minus );
+                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_minus + idx_x );
+                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_minus + ix_plus );
+                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + idx_y + ix_minus );
+                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + idx_y + ix_plus );
+                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_plus + ix_minus );
+                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_plus + idx_x );
+                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_plus + ix_plus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + ix_minus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + idx_x );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + ix_plus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + ix_minus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + idx_x );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + ix_plus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + ix_minus );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + idx_x );
+                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + ix_plus );
+            }
+        }
+    }
 }

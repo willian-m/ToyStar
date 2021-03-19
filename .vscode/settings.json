@@ -3,9 +3,11 @@
         "${workspaceFolder}/include/**"
     ],
     "cSpell.words": [
+        "Bidimensional",
         "INTEGRATORRK",
         "SPHMATH",
         "avrg",
+        "icell",
         "ipart",
         "istep",
         "jpart",
@@ -14,6 +16,7 @@
         "lcurrent",
         "llambda",
         "lprevious",
+        "ncells",
         "nside",
         "nsteps"
     ],

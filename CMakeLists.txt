@@ -43,6 +43,7 @@ target_link_libraries (ToyStar.exe
                        sph_math
                        eos_polytropic
                        particle
+                       cell
                        particle_system 
                        vec3
                        integrator_rk4

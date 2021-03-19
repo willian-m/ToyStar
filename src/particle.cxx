@@ -32,7 +32,17 @@ Particle<T>::Particle(T r_in, T v_in, T a_in, double mass){
     this->mass = mass;
 }
 
+template <class T>
+void Particle<T>::add_neighbour_particle(Particle<T>* part, double d){
+    neighbour_list.emplace_back(part);
+    neighbour_list_distance.emplace_back(d);
+};
 
+template <class T>
+void Particle<T>::clear_neighbors(){
+    neighbour_list.clear();
+    neighbour_list_distance.clear();
+}
 
 /*void Particle::set_position(double x, double y, double z){
     r.x = x;

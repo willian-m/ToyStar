@@ -52,6 +52,7 @@ target_link_libraries (${particle_system_test_exe}
                        eos_polytropic
                        particle
                        particle_system 
+                       cell
                        vec3
                        ${Boost_FILESYSTEM_LIBRARY}
                        ${Boost_SYSTEM_LIBRARY}
@@ -64,7 +65,8 @@ target_link_libraries (${rk4_test_exe}
                        sph_math
                        eos_polytropic
                        particle
-                       particle_system 
+                       particle_system
+                       cell 
                        vec3
                        integrator_rk4
                        ${Boost_FILESYSTEM_LIBRARY}
