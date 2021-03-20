@@ -37,14 +37,14 @@ private:
     int get_grid_idx(Vec3 r);
     int get_grid_idx(Vec2 r);
     void clear_grid();
+    void update_densities();
 
 
 public:
     ParticleSystem(std::vector<T> r, std::vector<T> v, 
                    std::vector<double> mass, double lh, double lambda, double nu,
                     EOSBase* leos);
-    double get_particle_density(int ipart); //< Density around a particle
-    double get_density(T ri); //< Density around a point
+    double get_point_density(T ri); //< Density around a point
     void update_acceleration();
     int get_nparticles();
     double get_h();

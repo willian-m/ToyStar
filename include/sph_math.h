@@ -2,6 +2,7 @@
 #define SPHMATH_H
 
 #include<math.h>
+#include<typeinfo>
 
 #include "vec3.h"
 
@@ -23,6 +24,8 @@ public:
     static double distance(Vec2 ri, Vec2 rj);
     static Vec3 gradient_kernel_spline(Vec3 ri, Vec3 rj, double h);
     static Vec2 gradient_kernel_spline(Vec2 ri, Vec2 rj, double h);
+    template <class T>
+    static double kernel_spline(double d, double h);
 
 };
 

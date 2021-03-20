@@ -21,6 +21,26 @@ double SPHMath::kernel_spline(Vec3 ri, Vec3 rj, double h){
     return 0;
 }
 
+template <class T>
+double SPHMath::kernel_spline(double d, double h){
+    double q = d/h;
+    
+    double norm = ((typeid(T) == typeid(Vec3) ) ? norm3D/std::pow(h,3) : norm2D/std::pow(h,2));
+    
+    if (q < 1.){
+        return (std::pow(2.-q,3) - 4.*pow(1.-q,3))*norm;
+    } else if (q < 2){
+        return (std::pow(2.-q,3))*norm;
+    } else {
+        return 0;
+    }
+
+    return 0;
+}
+template double SPHMath::kernel_spline<Vec3>(double d, double h);
+template double SPHMath::kernel_spline<Vec2>(double d, double h);
+
+
 double SPHMath::kernel_spline(Vec2 ri, Vec2 rj, double h){
     double q = SPHMath::distance(ri, rj)/h;
     double norm = norm2D/std::pow(h,2);

@@ -54,7 +54,7 @@ void PrintParticleSystem(ParticleSystem<Vec3>* sys,std::string filename){
             out_file <<p->get_mass()<<"\t"
                 <<x<<"\t"<<y<<"\t"<<z<<"\t"
                 <<vel.x<<"\t"<<vel.y<<"\t"<<vel.z<<"\t"
-                <<sys->get_density(Vec3(x,y,z))<<std::endl;
+                <<sys->get_particle(ipart)->get_density()<<std::endl;
         }
     }
     out_file << std::flush;
@@ -75,7 +75,7 @@ void PrintParticleSystem(ParticleSystem<Vec2>* sys,std::string filename){
             out_file <<p->get_mass()<<"\t"
                 <<x<<"\t"<<y<<"\t"<<z<<"\t"
                 <<vel.x<<"\t"<<vel.y<<"\t"<<.0<<"\t"
-                <<sys->get_density(Vec2(x,y))<<std::endl;
+                <<sys->get_particle(ipart)->get_density()<<std::endl;
         }
     }
     out_file << std::flush;
@@ -94,7 +94,7 @@ void PrintDensityAlongX(ParticleSystem<Vec2>* sys,std::string filename){
         int const nr = max_r/dr;
         for (int ir=0; ir<nr;++ir){
             double r = ir*dr;
-            out_density <<r<<"\t"<<sys->get_density(Vec2(r,0))<<std::endl;
+            out_density <<r<<"\t"<<sys->get_point_density(Vec2(r,0))<<std::endl;
         }
     }
     out_density << std::flush;
@@ -113,7 +113,7 @@ void PrintDensityAlongX(ParticleSystem<Vec3>* sys,std::string filename){
         int const nr = max_r/dr;
         for (int ir=0; ir<nr;++ir){
             double r = ir*dr;
-            out_density <<r<<"\t"<<sys->get_density(Vec3(r,0,0))<<std::endl;
+            out_density <<r<<"\t"<<sys->get_point_density(Vec3(r,0,0))<<std::endl;
         }
     }
     out_density << std::flush;

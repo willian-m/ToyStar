@@ -34,17 +34,6 @@ ParticleSystem<T>::ParticleSystem(std::vector<T> r,
 }
 
 template <class T>
-double ParticleSystem<T>::get_particle_density(int ipart){
-    double density = 0;
-    T ri = sph_particles[ipart].get_position();
-    for (int jpart=0;jpart<nparticles;++jpart){
-        density += sph_particles[jpart].get_mass()
-                   *SPHMath::kernel_spline(ri,sph_particles[jpart].get_position(),h);
-    }
-    return density;
-}
-
-template <class T>
 void ParticleSystem<T>::update_acceleration(){
 
     clear_grid();
@@ -58,10 +47,12 @@ void ParticleSystem<T>::update_acceleration(){
     }
 
     //Setup grid
-    //TODO: Implement switch from 2D and 3D grids
     //TODO: Implement Interface to decide grid boundaries
     setup_grid(Vec3(-1,-1,-1),Vec3(1,1,1));
-    find_neighbor_particles();
+
+    find_neighbor_particles(); //Create l
+    update_densities(); //Update the densities of all particles
+                        // This does not consume neighbour list
 
 
     for (int ipart=0; ipart<nparticles;++ipart){
@@ -69,7 +60,7 @@ void ParticleSystem<T>::update_acceleration(){
         T ri = sph_particles[ipart].get_position();
         T acc_i = sph_particles[ipart].get_acceleration();
 
-        double rho_i = get_density(ri);
+        double rho_i = sph_particles[ipart].get_density();
         double P_i = eos->get_pressure(rho_i);
         double p_over_rho2_i = P_i/(rho_i*rho_i);
 
@@ -82,7 +73,7 @@ void ParticleSystem<T>::update_acceleration(){
             T rj = neigh_part->get_position();
             T acc_j = neigh_part->get_acceleration();
             double m = neigh_part->get_mass();
-            double rho_j = get_density(rj);
+            double rho_j = neigh_part->get_density();
             double P_j = eos->get_pressure(rho_j);
             double p_over_rho2_j = P_j/(rho_j*rho_j);
             T gradient = SPHMath::gradient_kernel_spline(ri,rj,h);
@@ -92,7 +83,6 @@ void ParticleSystem<T>::update_acceleration(){
             sph_particles[ipart].set_acceleration(acc_i);
             //Remove ipart from the neighbour list of jpart to avoid double 
             //counting
-            //neigh_part->erase_neighbor(&sph_particles[ipart]);
             neigh_part->erase_neighbor(&sph_particles[ipart]);
         }
           
@@ -100,7 +90,20 @@ void ParticleSystem<T>::update_acceleration(){
 }
 
 template <class T>
-double ParticleSystem<T>::get_density(T ri){
+void ParticleSystem<T>::update_densities(){
+    for (auto part = sph_particles.begin(); part != sph_particles.end(); ++part){
+        double rho = .0;
+        for (auto neigh_part = part->get_begin_neighbor_list();
+                  neigh_part != part->get_end_neighbor_list(); ++neigh_part){
+            rho += neigh_part->particle_ptr->get_mass() * SPHMath::kernel_spline<T>(neigh_part->distance, h);
+        }
+        part->set_density(rho);
+    }
+
+}
+
+template <class T>
+double ParticleSystem<T>::get_point_density(T ri){
     double density = 0;
     for (int jpart =0; jpart<nparticles;++jpart){
         density += sph_particles[jpart].get_mass()
