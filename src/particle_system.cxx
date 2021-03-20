@@ -73,13 +73,12 @@ void ParticleSystem<T>::update_acceleration(){
         double P_i = eos->get_pressure(rho_i);
         double p_over_rho2_i = P_i/(rho_i*rho_i);
 
-        int num_neighbors = sph_particles[ipart].get_num_neighbors();
         auto begin_neighbor_list = sph_particles[ipart].get_begin_neighbor_list();
-        auto end_neighbor_list = sph_particles[ipart].get_begin_neighbor_list();
+        auto end_neighbor_list = sph_particles[ipart].get_end_neighbor_list();
         for (auto neigh_part_it = begin_neighbor_list; 
                   neigh_part_it != end_neighbor_list; ++neigh_part_it){
         //for (int jpart=0; jpart<num_neighbors; ++jpart ){
-            Particle<T>* neigh_part = (*neigh_part_it).particle_ptr;
+            Particle<T>* neigh_part = neigh_part_it->particle_ptr;
             T rj = neigh_part->get_position();
             T acc_j = neigh_part->get_acceleration();
             double m = neigh_part->get_mass();
@@ -180,17 +179,6 @@ void ParticleSystem<T>::find_neighbor_particles(){
                         jpart->add_neighbour_particle((*ipart),d);
                     }
                 }
-                /*for ( auto jpart = (*neighbour_cell)->particle_list.begin();
-                           jpart != (*neighbour_cell)->particle_list.end(); ++jpart ){
-
-                    //a) Compute distance between ipart and jpart
-                    double d = SPHMath::distance(ipart_pos,(*jpart)->get_position());
-                    //b) If distance < 2h, set particles as neighbors
-                    if (d < 2*h ) {
-                        (*ipart)->add_neighbour_particle((*jpart),d);
-                        (*jpart)->add_neighbour_particle((*ipart),d);
-                    }
-                }*/
             }
             // 3) Remove particle from the cell, to avoid looking into it again
             ipart = it_cell->particle_list.erase(ipart); // This already update to look at next particle
@@ -252,7 +240,8 @@ void ParticleSystem<T>::build_cell_neighbour_list(){
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_minus + idx_x );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_minus + ix_plus );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + ix_minus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + idx_x );
+                if (typeid(T) == typeid(Vec3) ) //Avoids self inclusion
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + idx_x );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + ix_plus );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + ix_minus );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + idx_x );
@@ -269,7 +258,8 @@ void ParticleSystem<T>::build_cell_neighbour_list(){
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + idx_x );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + ix_plus );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + ix_minus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + idx_x );
+                if (typeid(T) == typeid(Vec3) ) //Avoids self inclusion
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + idx_x );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + ix_plus );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + ix_minus );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + idx_x );

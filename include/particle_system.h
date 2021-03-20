@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <algorithm>
+#include <typeinfo>
 
 #include "particle.h"
 #include "sph_math.h"
