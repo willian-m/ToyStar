@@ -2,20 +2,30 @@
 #define PARTICLE_H
 
 #include <vector>
+#include <list>
 #include "vec2.h"
 #include "vec3.h"
+
 
 template <class T>
 class Particle{
 
 private:
-    T r;                                        ///< Particle position
-    T v;                                        ///< Particle velocity
-    T a;                                        ///< Particle acceleration
-    double mass;                                ///< Particle mass
-    std::vector<Particle<T>*> neighbour_list;   ///< List of pointers to particles that are in the neighborhood of the particle
-    std::vector<double> neighbour_list_distance;///< List with distance to neighbour particles
+
+    struct NeighbourParticle
+    {
+        Particle<T>* particle_ptr;
+        double distance;
+    };
+    std::list<NeighbourParticle> neighbour_list;   ///< List of pointers to particles that are in the neighborhood of the particle
+
+    T r;                                                    ///< Particle position
+    T v;                                                    ///< Particle velocity
+    T a;                                                    ///< Particle acceleration
+    double mass;                                            ///< Particle mass
+    
 public:
+
 
     //Creates a particle
     //Particle(double x, double y, double z, double vx, double vy, double vz, double ax, double ay, double az, double mass);
@@ -33,9 +43,12 @@ public:
     void set_mass(double m);
     void add_neighbour_particle(Particle<T>* part, double d);
     int get_num_neighbors();
-    Particle<T>* get_neighbor(int i);
-    double get_neighbor_distance(int i);
-    void clear_neighbors();
+    auto get_begin_neighbor_list();
+    auto get_end_neighbor_list();
+    //Particle<T*>
+    void clear_neighbor_list();
+    void erase_neighbor(Particle<T>* part);
+    //Particle<T>* get_neighbour_particle(std::set<NeighbourParticle>::iterator it);
     
     //Getters
     T get_position();
@@ -65,10 +78,11 @@ inline T Particle<T>::get_acceleration(){ return a;};
 template <class T>
 inline int Particle<T>::get_num_neighbors(){ return neighbour_list.size();};
 template <class T>
-inline Particle<T>* Particle<T>::get_neighbor(int i){ return neighbour_list[i];};
+inline auto Particle<T>::get_begin_neighbor_list(){ return neighbour_list.begin();};
 template <class T>
-inline double Particle<T>::get_neighbor_distance(int i){ return neighbour_list_distance[i];};
-
+inline auto Particle<T>::get_end_neighbor_list(){ return neighbour_list.end();};
+//template <class T>
+//inline Particle<T>* Particle<T>::get_neighbour_particle(std::set<Particle<T>::NeighbourParticle>::iterator it){return it->particle_ptr;};
 template <class T>
 inline double Particle<T>::get_mass(){ return mass;};
 

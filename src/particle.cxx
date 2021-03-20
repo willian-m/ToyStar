@@ -6,24 +6,6 @@
  A class to store SPH particle properties. There is no dynamic in here
 */
 
-/*Particle::Particle(double x, double y, double z, double vx, double vy, double vz, double ax, double ay, double az, double mass){
-
-    r.x = x;
-    r.y = y;
-    r.z = z;
-
-    v.x = vx;
-    v.y = vy;
-    v.z = vz;
-
-    a.x = ax;
-    a.y = ay;
-    a.z = az;
-
-    this->mass = mass;
-
-}*/
-
 template <class T>
 Particle<T>::Particle(T r_in, T v_in, T a_in, double mass){
     r = r_in;
@@ -34,32 +16,25 @@ Particle<T>::Particle(T r_in, T v_in, T a_in, double mass){
 
 template <class T>
 void Particle<T>::add_neighbour_particle(Particle<T>* part, double d){
-    neighbour_list.emplace_back(part);
-    neighbour_list_distance.emplace_back(d);
+    //NeighbourParticle part_struct = {part, d};
+    neighbour_list.emplace_back(NeighbourParticle{part,d});
+    
 };
 
 template <class T>
-void Particle<T>::clear_neighbors(){
+void Particle<T>::clear_neighbor_list(){
     neighbour_list.clear();
-    neighbour_list_distance.clear();
 }
 
-/*void Particle::set_position(double x, double y, double z){
-    r.x = x;
-    r.y = y;
-    r.z = z;
+template <class T>
+void Particle<T>::erase_neighbor(Particle<T>* part){
+    for (auto neigh_part = neighbour_list.begin();
+              neigh_part != neighbour_list.end(); ){
+        if ( neigh_part->particle_ptr == part ) {
+            neighbour_list.erase(neigh_part);
+            break;
+        } else {
+            ++neigh_part;
+        }
+    }
 }
-
-
-void Particle::set_velocity(double vx, double vy, double vz){
-    v.x = vx;
-    v.y = vy;
-    v.z = vz;
-}
-
-
-void Particle::set_acceleration(double ax, double ay, double az){
-    a.x = ax;
-    a.y = ay;
-    a.z = az;
-}*/

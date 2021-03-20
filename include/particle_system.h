@@ -4,7 +4,7 @@
 #include <vector>
 
 #include <assert.h>
-#include <set>
+#include <algorithm>
 
 #include "particle.h"
 #include "sph_math.h"

@@ -54,7 +54,7 @@ void ParticleSystem<T>::update_acceleration(){
         T vi = sph_particles[ipart].get_velocity();
         T acc = (-1.)*lambda*ri+(-1.)*nu*vi;
         sph_particles[ipart].set_acceleration(acc);
-        sph_particles[ipart].clear_neighbors(); //Clear list of neighbors
+        sph_particles[ipart].clear_neighbor_list(); //Clear list of neighbors, just in case
     }
 
     //Setup grid
@@ -74,8 +74,12 @@ void ParticleSystem<T>::update_acceleration(){
         double p_over_rho2_i = P_i/(rho_i*rho_i);
 
         int num_neighbors = sph_particles[ipart].get_num_neighbors();
-        for (int jpart=ipart+1; jpart<num_neighbors; ++jpart ){
-            Particle<T>* neigh_part = sph_particles[ipart].get_neighbor(jpart);
+        auto begin_neighbor_list = sph_particles[ipart].get_begin_neighbor_list();
+        auto end_neighbor_list = sph_particles[ipart].get_begin_neighbor_list();
+        for (auto neigh_part_it = begin_neighbor_list; 
+                  neigh_part_it != end_neighbor_list; ++neigh_part_it){
+        //for (int jpart=0; jpart<num_neighbors; ++jpart ){
+            Particle<T>* neigh_part = (*neigh_part_it).particle_ptr;
             T rj = neigh_part->get_position();
             T acc_j = neigh_part->get_acceleration();
             double m = neigh_part->get_mass();
@@ -85,8 +89,12 @@ void ParticleSystem<T>::update_acceleration(){
             T gradient = SPHMath::gradient_kernel_spline(ri,rj,h);
             acc_i = acc_i +(-1.)*m*(p_over_rho2_j+p_over_rho2_i)*gradient;
             acc_j = acc_j + m*(p_over_rho2_j+p_over_rho2_i)*gradient;
-            sph_particles[jpart].set_acceleration(acc_j);
+            neigh_part->set_acceleration(acc_j);
             sph_particles[ipart].set_acceleration(acc_i);
+            //Remove ipart from the neighbour list of jpart to avoid double 
+            //counting
+            //neigh_part->erase_neighbor(&sph_particles[ipart]);
+            neigh_part->erase_neighbor(&sph_particles[ipart]);
         }
           
     }
