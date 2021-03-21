@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(ToyStar VERSION 0.1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
 
 #configure a header file to pass the version number to the source code:
 #configure_file(TutorialConfig.h.in TutorialConfig.h)
@@ -18,6 +20,13 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")
+
+#Tells the source code that root is present
+find_package(ROOT)
+if(ROOT_FOUND)
+    set(CMAKE_CXX_STANDARD 17) #ROOT requires c++17
+    add_definitions( -DROOT_FOUND )
+endif()
 
 #Include folders
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -47,6 +56,7 @@ target_link_libraries (ToyStar.exe
                        particle_system 
                        vec3
                        integrator_rk4
+                       ${ROOT_LIBRARIES}
                        )
 
 

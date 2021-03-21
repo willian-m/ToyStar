@@ -9,6 +9,20 @@
 #include "particle_system.h"
 #include "integrator_rk4.h"
 
+#ifdef ROOT_FOUND
+#include <typeinfo>
+#include <chrono>
+#include <thread>
+#include "TApplication.h"
+#include "TCanvas.h"
+#include "TF1.h"
+#include "TGraph.h"
+#include "TAxis.h"
+//#include "TGraph2D.h"
+#include "TView.h"
+#include "TPolyMarker3D.h"
+#endif
+
 enum HydroType {
     Bidimensional = 2,
     Tridimensional = 3
@@ -37,6 +51,8 @@ struct ToyStarPars
     double dt;
 
     HydroType mode;
+
+    bool dynamical_plots_enabled;
 };
 
 void PrintParticleSystem(ParticleSystem<Vec3>* sys,std::string filename){
@@ -60,6 +76,7 @@ void PrintParticleSystem(ParticleSystem<Vec3>* sys,std::string filename){
     out_file << std::flush;
     out_file.close();
 }
+
 void PrintParticleSystem(ParticleSystem<Vec2>* sys,std::string filename){
     std::ofstream out_file(filename,std::ios::trunc);
 
@@ -168,12 +185,96 @@ void EvolveIt(ToyStarPars pars, std::vector<T>* r, std::vector<T>* v,   std::vec
     //Simulate it!    
     int barWidth = 70; //Width of progress bar
     const clock_t begin_time = clock();
+
+    //Prepare canvas for drawing
+    #ifdef ROOT_FOUND
+
+    //Allow plots to be shown
+    int argc = 1;
+    char* argv[1] = {"ToyStar.exe"};
+    TApplication app("Toy Star", &argc, argv);
+    
+    //Setup analytical solution
+    TF1* analytical_sol = new TF1("analytical_sol","[0]*([2]*[2]-x*x)/(4*[1])",0,.75);
+    analytical_sol->SetParameter(0, pars.lambda);
+    analytical_sol->SetParameter(1, pars.pressure_const);
+    analytical_sol->SetParameter(2, pars.star_radius);
+    analytical_sol->SetLineColor(kRed);
+    
+    //Setup axis
+    analytical_sol->GetYaxis()->SetRangeUser(0,3);
+    analytical_sol->GetXaxis()->SetRangeUser(0,1);
+    analytical_sol->GetXaxis()->SetTitle("R");
+    analytical_sol->GetYaxis()->SetTitle("#rho");
+    
+    //Setup plot of particle positions
+    TCanvas* cParticlePos = new TCanvas("cParticlePos","Particle Positions", 800, 800);
+    TView* view_particles = TView::CreateView(1);
+    view_particles->SetRange(-3,-3,-3,3,3,3);
+    TPolyMarker3D* particle_pos = nullptr;
+    //TGraph2D* particle_pos = nullptr;
+
+    TCanvas* cDensity = new TCanvas("cDensity","Density", 800,800);
+    analytical_sol->Draw();
+    TGraph* density_graph = nullptr;
+
+    
+    #endif
     for(int istep=0; istep<pars.nsteps;++istep){
 
         //Evolve the system
         integrator.do_step();
         //Iterate over particles, getting their position, velocity, mass and density
         //Dump it in a text file
+
+        //Do ROOT drawing :)
+        #ifdef ROOT_FOUND
+        if (pars.dynamical_plots_enabled){
+            if (particle_pos != nullptr) delete particle_pos;
+            if (density_graph != nullptr) delete density_graph;
+
+
+            int nparticles = current.get_nparticles();
+            cParticlePos->cd();
+            particle_pos = new TPolyMarker3D(nparticles);
+            //particle_pos = new TGraph2D(nparticles);
+
+            std::vector<double> r, rho;
+            for (int ipart=0; ipart<nparticles;++ipart){
+                Particle<T>* p = current.get_particle(ipart);
+                T pos = p->get_position();
+                double x, y, z;
+                x = pos.x; y = pos.y;
+                z = 0;
+                particle_pos->SetPoint(ipart,x,y,z);
+                r.push_back(sqrt(pow(x,2) + pow(y,2) +pow(z,2) ));
+
+                rho.push_back( p->get_density() );
+                //rho.push_back(analytical_sol->Eval(r[ipart])/p->get_density());
+            
+            }
+            
+            particle_pos->SetMarkerSize(1);
+            particle_pos->SetMarkerColor(kBlue);
+            particle_pos->SetMarkerStyle(20);
+
+            particle_pos->Draw("P");
+            cParticlePos->Modified(); cParticlePos->Update();
+
+            cDensity->cd();
+            density_graph = new TGraph(nparticles,r.data(),rho.data());
+
+            density_graph->SetMarkerStyle(20);
+            density_graph->SetMarkerColor(kBlue);
+
+            density_graph->Draw("p");
+            cDensity->Modified(); cDensity->Update();
+
+            //app.Run();
+
+            //std::this_thread::sleep_for(std::chrono::milliseconds(200)); //Performance limiter so people can see what is happening :)
+        }    
+        #endif
 
         //Progress bar: https://stackoverflow.com/a/14539953/2754579
         float progress = (double) istep/(double) pars.nsteps;
@@ -208,6 +309,7 @@ int main(int argc, char* argv[]){
     //Choose run mode
     ToyStarPars pars;
     pars.mode = Bidimensional;
+    pars.dynamical_plots_enabled = true;
     
     //System parameters - initial positions
     pars.L = 2;

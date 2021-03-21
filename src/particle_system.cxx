@@ -97,6 +97,8 @@ void ParticleSystem<T>::update_densities(){
                   neigh_part != part->get_end_neighbor_list(); ++neigh_part){
             rho += neigh_part->particle_ptr->get_mass() * SPHMath::kernel_spline<T>(neigh_part->distance, h);
         }
+        //Includes current particle
+        rho += part->get_mass()*SPHMath::kernel_spline<T>(.0, h);
         part->set_density(rho);
     }
 
