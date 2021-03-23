@@ -217,9 +217,8 @@ void EvolveIt(ToyStarPars pars, std::vector<T>* r, std::vector<T>* v,   std::vec
     TCanvas* cDensity = new TCanvas("cDensity","Density", 800,800);
     analytical_sol->Draw();
     TGraph* density_graph = nullptr;
-
-    
     #endif
+
     for(int istep=0; istep<pars.nsteps;++istep){
 
         //Evolve the system
@@ -245,7 +244,7 @@ void EvolveIt(ToyStarPars pars, std::vector<T>* r, std::vector<T>* v,   std::vec
                 T pos = p->get_position();
                 double x, y, z;
                 x = pos.x; y = pos.y;
-                z = 0;
+                z = pos.z;
                 particle_pos->SetPoint(ipart,x,y,z);
                 r.push_back(sqrt(pow(x,2) + pow(y,2) +pow(z,2) ));
 
@@ -308,7 +307,8 @@ int main(int argc, char* argv[]){
 
     //Choose run mode
     ToyStarPars pars;
-    pars.mode = Bidimensional;
+    //pars.mode = Bidimensional;
+    pars.mode = Tridimensional; 
     pars.dynamical_plots_enabled = true;
     
     //System parameters - initial positions
@@ -371,7 +371,7 @@ int main(int argc, char* argv[]){
             pos.x = -pars.L/2 + ix*pars.dL;
             for (int iy = 0; iy<pars.nside; ++iy){
                 pos.y = -pars.L/2 + iy*pars.dL;
-                for (int iz = 0; iy<pars.nside; ++iz){
+                for (int iz = 0; iz<pars.nside; ++iz){
                     pos.z = -pars.L/2 + iz*pars.dL;
                     r.push_back(pos);
                     v.push_back(vel);

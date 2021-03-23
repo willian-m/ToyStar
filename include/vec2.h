@@ -8,6 +8,7 @@ class Vec2{
 public:
     double x; ///< x coordinate of the vector
     double y; ///< y coordinate of the vector
+    static constexpr double z = 0; ///< We are always constrained to z = 0 plane
 
     Vec2();
     Vec2(double x, double y);
