@@ -110,3 +110,12 @@ IntegratorRK4<T>::IntegratorRK4(ParticleSystem<T>* lcurrent,
     assert(this->nparticles == buffer->get_nparticles() && "Buffer system has different number of particles than the current one");
     assert(this->nparticles == this->next_sys->get_nparticles() && "Next system has different number of particles than the current one");
 };
+template IntegratorRK4<Vec3>::IntegratorRK4(ParticleSystem<Vec3>* lcurrent,
+                                            ParticleSystem<Vec3>* lnext,
+		                            ParticleSystem<Vec3>* lbuffer,
+                                            double ldt);
+template IntegratorRK4<Vec2>::IntegratorRK4(ParticleSystem<Vec2>* lcurrent,
+                                            ParticleSystem<Vec2>* lnext,
+                                            ParticleSystem<Vec2>* lbuffer,
+                                            double ldt);
+

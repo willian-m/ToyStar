@@ -13,6 +13,8 @@ Particle<T>::Particle(T r_in, T v_in, T a_in, double mass){
     a = a_in;
     this->mass = mass;
 }
+template Particle<Vec2>::Particle(Vec2 r_in, Vec2 v_in, Vec2 a_in, double mass);
+template Particle<Vec3>::Particle(Vec3 r_in, Vec3 v_in, Vec3 a_in, double mass);
 
 template <class T>
 void Particle<T>::add_neighbour_particle(Particle<T>* part, double d){
@@ -20,11 +22,8 @@ void Particle<T>::add_neighbour_particle(Particle<T>* part, double d){
     neighbour_list.emplace_back(NeighbourParticle{part,d});
     
 };
-
-template <class T>
-void Particle<T>::clear_neighbor_list(){
-    neighbour_list.clear();
-}
+template void Particle<Vec2>::add_neighbour_particle(Particle<Vec2>*  part, double d);
+template void Particle<Vec3>::add_neighbour_particle(Particle<Vec3>*  part, double d);
 
 template <class T>
 void Particle<T>::erase_neighbor(Particle<T>* part){
@@ -38,3 +37,5 @@ void Particle<T>::erase_neighbor(Particle<T>* part){
         }
     }
 }
+template void Particle<Vec2>::erase_neighbor(Particle<Vec2>* part);
+template void Particle<Vec3>::erase_neighbor(Particle<Vec3>* part);

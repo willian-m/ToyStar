@@ -33,6 +33,20 @@ ParticleSystem<T>::ParticleSystem(std::vector<T> r,
     update_acceleration();
 }
 
+template ParticleSystem<Vec3>::ParticleSystem(std::vector<Vec3> r,
+                               std::vector<Vec3> v,
+                               std::vector<double> mass, double lh,
+                               double llambda, double lnu,
+                               EOSBase* leos
+                               );
+template ParticleSystem<Vec2>::ParticleSystem(std::vector<Vec2> r,
+                               std::vector<Vec2> v,
+                               std::vector<double> mass, double lh,
+                               double llambda, double lnu,
+                               EOSBase* leos
+                               );
+
+
 template <class T>
 void ParticleSystem<T>::update_acceleration(){
 
@@ -113,6 +127,9 @@ double ParticleSystem<T>::get_point_density(T ri){
     }
     return density;
 }
+template double ParticleSystem<Vec3>::get_point_density(Vec3 ri);
+template double ParticleSystem<Vec2>::get_point_density(Vec2 ri);
+
 
 template <class T>
 void ParticleSystem<T>::setup_grid(Vec3 grid_min, Vec3 grid_max){

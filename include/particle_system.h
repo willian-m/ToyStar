@@ -7,9 +7,11 @@
 #include <algorithm>
 #include <typeinfo>
 
-#include "particle.h"
+#include "vec2.h"
+#include "vec3.h"
 #include "sph_math.h"
 #include "eos_base.h"
+#include "particle.h"
 #include "cell.h"
 
 template <class T>

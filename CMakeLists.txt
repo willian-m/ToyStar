@@ -48,15 +48,14 @@ add_subdirectory (unit_tests)
 
 add_executable(ToyStar.exe src/ToyStar)
 target_link_libraries (ToyStar.exe
-                       vec2
-                       sph_math
-                       eos_polytropic
-                       particle
-                       cell
-                       particle_system 
-                       vec3
-                       integrator_rk4
                        ${ROOT_LIBRARIES}
+                       integrator_rk4
+                       particle_system 
+                       eos_polytropic
+                       sph_math
+                       particle
+                       vec3
+                       vec2
                        )
 
 

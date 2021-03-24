@@ -37,9 +37,9 @@ set_target_properties (integrator_rk4 PROPERTIES COMPILE_FLAGS "${CompileFlags}"
 set_target_properties (integrator_rk4 PROPERTIES VERSION "0.1.0")
 set_target_properties(integrator_rk4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib/)
 
-add_library(cell SHARED cell.cxx)
-set_target_properties (cell PROPERTIES COMPILE_FLAGS "${CompileFlags}")
-set_target_properties (cell PROPERTIES VERSION "0.1.0")
-set_target_properties(cell PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib/)
+#add_library(cell SHARED cell.cxx)
+#set_target_properties (cell PROPERTIES COMPILE_FLAGS "${CompileFlags}")
+#set_target_properties (cell PROPERTIES VERSION "0.1.0")
+#set_target_properties(cell PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib/)
 
 #install(TARGETS vec3 DESTINATION ${CMAKE_HOME_DIRECTORY})

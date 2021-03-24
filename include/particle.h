@@ -92,6 +92,10 @@ inline double Particle<T>::get_mass(){ return mass;};
 template <class T>
 inline double Particle<T>::get_density(){ return density;};
 
+
+template <class T>
+inline void Particle<T>::clear_neighbor_list(){  neighbour_list.clear(); };
+
 template class Particle<Vec3>;
 template class Particle<Vec2>;
 
