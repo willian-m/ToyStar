@@ -16,65 +16,69 @@ set(particle_test_exe "particle_test.exe")
 #message("vec3 is at: ${vec3_lib}")
 
 #Configure build
-add_executable("${vec3_test_exe}" vec3_test)
+add_executable("${vec3_test_exe}" vec3_test.cxx)
 target_link_libraries (${vec3_test_exe} 
-                       vec2 
-                       vec3
                        ${Boost_FILESYSTEM_LIBRARY}
                        ${Boost_SYSTEM_LIBRARY}
                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+                       vec3
+                       vec2
+                       vec1
                        )
 
-add_executable("${particle_test_exe}" particle_test)
+add_executable("${particle_test_exe}" particle_test.cxx)
 target_link_libraries (${particle_test_exe}
-                       vec2
-                       vec3
                        particle
-                       ${Boost_FILESYSTEM_LIBRARY}
-                       ${Boost_SYSTEM_LIBRARY}
-                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-                       )
-
-add_executable("${sph_math_test_exe}" sph_math_test)
-target_link_libraries (${sph_math_test_exe}
-                       vec2 
                        vec3
-                       sph_math
+                       vec2
+                       vec1
                        ${Boost_FILESYSTEM_LIBRARY}
                        ${Boost_SYSTEM_LIBRARY}
                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
                        )
 
-add_executable("${particle_system_test_exe}" particle_system_test)
-target_link_libraries (${particle_system_test_exe}
+add_executable("${sph_math_test_exe}" sph_math_test.cxx)
+target_link_libraries (${sph_math_test_exe}
+                       sph_math
+                       vec3
                        vec2
+                       vec1
+                       ${Boost_FILESYSTEM_LIBRARY}
+                       ${Boost_SYSTEM_LIBRARY}
+                       ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+                       )
+
+add_executable("${particle_system_test_exe}" particle_system_test.cxx)
+target_link_libraries (${particle_system_test_exe}
                        sph_math
                        eos_polytropic
                        particle
                        particle_system 
                        cell
                        vec3
+                       vec2
+                       vec1
                        ${Boost_FILESYSTEM_LIBRARY}
                        ${Boost_SYSTEM_LIBRARY}
                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
                        )
 
-add_executable("${rk4_test_exe}" rk4_test)
+add_executable("${rk4_test_exe}" rk4_test.cxx)
 target_link_libraries (${rk4_test_exe}
-                       vec2
+                       particle_system
+                       particle
+                       integrator_rk4
                        sph_math
                        eos_polytropic
-                       particle
-                       particle_system
-                       cell 
                        vec3
-                       integrator_rk4
+                       vec2
+                       vec1
                        ${Boost_FILESYSTEM_LIBRARY}
                        ${Boost_SYSTEM_LIBRARY}
                        ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
                        )
 
-add_executable("${eos_test_exe}" eos_test)
+add_executable("${eos_test_exe}" eos_test.cxx)
 target_link_libraries (${eos_test_exe}
                        eos_polytropic
                        ${Boost_FILESYSTEM_LIBRARY}

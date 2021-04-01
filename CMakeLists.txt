@@ -46,7 +46,7 @@ add_subdirectory (src)
 add_subdirectory (unit_tests)
 
 
-add_executable(ToyStar.exe src/ToyStar)
+add_executable(ToyStar.exe src/ToyStar.cxx)
 target_link_libraries (ToyStar.exe
                        ${ROOT_LIBRARIES}
                        integrator_rk4
@@ -56,6 +56,7 @@ target_link_libraries (ToyStar.exe
                        particle
                        vec3
                        vec2
+                       vec1
                        )
 
 
