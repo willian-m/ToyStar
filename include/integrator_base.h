@@ -23,5 +23,6 @@ public:
 
 template class IntegratorBase<Vec3>;
 template class IntegratorBase<Vec2>;
+template class IntegratorBase<Vec1>;
 
 #endif

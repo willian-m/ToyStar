@@ -4,6 +4,8 @@
 #include <array>
 #include <iostream>
 
+#include "vec1.h"
+#include "vec2.h"
 #include "vec3.h"
 #include "particle.h"
 #include "integrator_base.h"
@@ -28,5 +30,6 @@ public:
 
 template class IntegratorRK4<Vec3>;
 template class IntegratorRK4<Vec2>;
+template class IntegratorRK4<Vec1>;
 
 #endif

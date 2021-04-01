@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <typeinfo>
 
+#include "vec1.h"
 #include "vec2.h"
 #include "vec3.h"
 #include "sph_math.h"
@@ -38,6 +39,7 @@ private:
     void add_particles_to_grid();
     int get_grid_idx(Vec3 r);
     int get_grid_idx(Vec2 r);
+    int get_grid_idx(Vec1 r);
     void clear_grid();
     void update_densities();
 
@@ -69,5 +71,6 @@ inline double ParticleSystem<T>::get_h(){return h;};
 
 template class ParticleSystem<Vec3>;
 template class ParticleSystem<Vec2>;
+template class ParticleSystem<Vec1>;
 
 #endif

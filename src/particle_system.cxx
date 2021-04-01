@@ -45,7 +45,12 @@ template ParticleSystem<Vec2>::ParticleSystem(std::vector<Vec2> r,
                                double llambda, double lnu,
                                EOSBase* leos
                                );
-
+template ParticleSystem<Vec1>::ParticleSystem(std::vector<Vec1> r,
+                               std::vector<Vec1> v,
+                               std::vector<double> mass, double lh,
+                               double llambda, double lnu,
+                               EOSBase* leos
+                               );
 
 template <class T>
 void ParticleSystem<T>::update_acceleration(){
@@ -129,19 +134,26 @@ double ParticleSystem<T>::get_point_density(T ri){
 }
 template double ParticleSystem<Vec3>::get_point_density(Vec3 ri);
 template double ParticleSystem<Vec2>::get_point_density(Vec2 ri);
+template double ParticleSystem<Vec1>::get_point_density(Vec1 ri);
 
 
 template <class T>
 void ParticleSystem<T>::setup_grid(Vec3 grid_min, Vec3 grid_max){
     double grid_step = 2*h;
     nx = (int) round((grid_max.x-grid_min.x)/grid_step);
-    ny = (int) round((grid_max.y-grid_min.y)/grid_step);
-    
     lim_x[0] = grid_min.x;
-    lim_y[0] = grid_min.y;
-
     lim_x[1] = (nx-1)*grid_step;
-    lim_y[1] = (ny-1)*grid_step;
+    
+
+    if ((typeid(Vec3) == typeid(T) ) | (typeid(Vec2) == typeid(T) )) {
+        ny = (int) round((grid_max.y-grid_min.y)/grid_step);
+        lim_y[0] = grid_min.y;
+        lim_y[1] = (ny-1)*grid_step;
+    } else {
+        ny = 1;
+        lim_y[0] = .0;
+        lim_y[1] = .0;
+    }
 
     if (typeid(Vec3) == typeid(T) ){
         nz = (int) round((grid_max.z-grid_min.z)/grid_step);
@@ -212,6 +224,15 @@ void ParticleSystem<T>::find_neighbor_particles(){
 
 /// Returns the cell index of a point of the grid
 template<class T>
+int ParticleSystem<T>::get_grid_idx(Vec1 r){
+    int ix = (int) ((r.x-lim_x[0])*nx/(lim_x[1]-lim_x[0]));
+    ix = ix < 0 ? 0 : (ix >= nx ? nx-1 : ix);
+
+    return ix;
+}
+
+
+template<class T>
 int ParticleSystem<T>::get_grid_idx(Vec2 r){
     int ix = (int) ((r.x-lim_x[0])*nx/(lim_x[1]-lim_x[0]));
     ix = ix < 0 ? 0 : (ix >= nx ? nx-1 : ix);
@@ -259,33 +280,36 @@ void ParticleSystem<T>::build_cell_neighbour_list(){
                 int current_cell_idx = idx_z + idx_y + idx_x;
                 
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_minus + ix_minus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_minus + idx_x );
+                if (typeid(T) == typeid(Vec2) )
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_minus + idx_x );
                 grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_minus + ix_plus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + ix_minus );
-                if (typeid(T) == typeid(Vec3) ) //Avoids self inclusion
-                    grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + idx_x );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + ix_plus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + ix_minus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + idx_x );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + ix_plus );
-                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_minus + ix_minus );
-                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_minus + idx_x );
-                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_minus + ix_plus );
-                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + idx_y + ix_minus );
-                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + idx_y + ix_plus );
-                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_plus + ix_minus );
-                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_plus + idx_x );
-                grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_plus + ix_plus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + ix_minus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + idx_x );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + ix_plus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + ix_minus );
-                if (typeid(T) == typeid(Vec3) ) //Avoids self inclusion
-                    grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + idx_x );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + ix_plus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + ix_minus );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + idx_x );
-                grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + ix_plus );
+                if (typeid(T) == typeid(Vec2) ){
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + ix_minus );
+                    if (typeid(T) == typeid(Vec3) ) //Avoids self inclusion
+                        grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + idx_x );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + idx_y + ix_plus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + ix_minus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + idx_x );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_minus + iy_plus + ix_plus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_minus + ix_minus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_minus + idx_x );
+                    grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_minus + ix_plus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( idx_z + idx_y + ix_minus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( idx_z + idx_y + ix_plus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_plus + ix_minus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_plus + idx_x );
+                    grid[current_cell_idx].neighbour_cell_list.insert( idx_z + iy_plus + ix_plus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + ix_minus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + idx_x );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_minus + ix_plus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + ix_minus );
+                    if (typeid(T) == typeid(Vec3) ) //Avoids self inclusion
+                        grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + idx_x );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + idx_y + ix_plus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + ix_minus );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + idx_x );
+                    grid[current_cell_idx].neighbour_cell_list.insert( iz_plus + iy_plus + ix_plus );
+                }
             }
         }
     }

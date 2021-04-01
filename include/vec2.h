@@ -1,9 +1,9 @@
 #ifndef VEC2_H
 #define VEC2_H
 
-#include <complex>
+#include "vec1.h"
 
-class Vec2{
+class Vec2 : public Vec1{
 
 public:
     double x; ///< x coordinate of the vector

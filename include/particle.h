@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <list>
+#include "vec1.h"
 #include "vec2.h"
 #include "vec3.h"
 
@@ -98,5 +99,6 @@ inline void Particle<T>::clear_neighbor_list(){  neighbour_list.clear(); };
 
 template class Particle<Vec3>;
 template class Particle<Vec2>;
+template class Particle<Vec1>;
 
 #endif

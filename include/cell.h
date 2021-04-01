@@ -43,5 +43,7 @@ inline void Cell<T>::clear_cell(){
 
 template class Cell<Vec3>;
 template class Cell<Vec2>;
+template class Cell<Vec1>;
+
 #endif
 

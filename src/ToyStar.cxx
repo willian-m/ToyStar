@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <string>
+#include <sstream>
 
 #include "eos_polytropic.h"
 #include "vec3.h"
@@ -24,6 +26,7 @@
 #endif
 
 enum HydroType {
+    Monodimensional = 1,
     Bidimensional = 2,
     Tridimensional = 3
 };
@@ -97,6 +100,47 @@ void PrintParticleSystem(ParticleSystem<Vec2>* sys,std::string filename){
     }
     out_file << std::flush;
     out_file.close();
+}
+
+void PrintParticleSystem(ParticleSystem<Vec1>* sys,std::string filename){
+    std::ofstream out_file(filename,std::ios::trunc);
+
+    //Dumps the data
+    if (out_file.is_open() && out_file.good()){
+        out_file << "# mass\tx\ty\tz\tvx\tvy\tvz\tdensity"<<std::endl;
+        int nparticles = sys->get_nparticles();
+        for (int ipart=0; ipart<nparticles;++ipart){
+            Particle<Vec1>* p = sys->get_particle(ipart);
+            Vec1 pos = p->get_position();
+            Vec1 vel = p->get_velocity();
+            double x = pos.x; double y = pos.y; double z = .0;
+            out_file <<p->get_mass()<<"\t"
+                <<x<<"\t"<<y<<"\t"<<z<<"\t"
+                <<vel.x<<"\t"<<0<<"\t"<<.0<<"\t"
+                <<sys->get_particle(ipart)->get_density()<<std::endl;
+        }
+    }
+    out_file << std::flush;
+    out_file.close();
+}
+
+void PrintDensityAlongX(ParticleSystem<Vec1>* sys,std::string filename){
+
+    //In addition, gets the density at (z=0, y=0)
+    std::ofstream out_density(filename,std::ios::trunc);
+
+    if (out_density.is_open() && out_density.good()){
+        out_density << "# r\tdensity"<<std::endl;
+        double const max_r=2.;
+        double const dr=1.e-2;
+        int const nr = max_r/dr;
+        for (int ir=0; ir<nr;++ir){
+            double r = ir*dr;
+            out_density <<r<<"\t"<<sys->get_point_density(Vec1(r))<<std::endl;
+        }
+    }
+    out_density << std::flush;
+    out_density.close();
 }
 
 void PrintDensityAlongX(ParticleSystem<Vec2>* sys,std::string filename){
@@ -307,14 +351,15 @@ int main(int argc, char* argv[]){
 
     //Choose run mode
     ToyStarPars pars;
-    //pars.mode = Bidimensional;
-    pars.mode = Tridimensional; 
+    pars.mode = Bidimensional;
+    //pars.mode = Tridimensional; 
+    pars.mode = Monodimensional;
     pars.dynamical_plots_enabled = true;
     
     //System parameters - initial positions
     pars.L = 2;
-    pars.nside = 20;
-    pars.dL = pars.L/pars.nside;
+    pars.nside = 20*20;//*5*4;
+    pars.dL = 2*pars.L/pars.nside;
 
     //System parameters
     pars.star_mass = 2.;
@@ -322,6 +367,7 @@ int main(int argc, char* argv[]){
     pars.particle_mass = pars.star_mass/pow(pars.nside,(int) pars.mode);
     //const double smoothing = 0.04/sqrt(pow(nside,3)/1000.);
     pars.smoothing = pars.dL;//*1.8;//1.5*0.04/sqrt(pow(nside,3)/1000.);
+    //pars.smoothing = .5;
     pars.damping = 2.;
 
     //Allocates eos
@@ -330,6 +376,7 @@ int main(int argc, char* argv[]){
 
     //Get attractive constant
     pars.lambda=20;
+
     if (pars.mode == Bidimensional){
         const double fact1 = 2*pars.pressure_const*pow(M_PI,-1./pars.poly_const);
         const double fact2 = pow(pars.star_mass*(1+pars.poly_const)/pow(pars.star_radius,2),1.+1./pars.poly_const);
@@ -338,6 +385,11 @@ int main(int argc, char* argv[]){
         const double fact1 = 2*pars.pressure_const*(1+pars.poly_const)*pow(M_PI,-3./(2*pars.poly_const));
         const double fact2 = tgamma(5./2. + pars.poly_const)*pars.star_mass/(tgamma(1.+pars.poly_const)*pow(pars.star_radius,3));
         pars.lambda = fact1*pow(fact2,1./pars.poly_const)/pow(pars.star_radius,2);
+    } else if (pars.mode == Monodimensional){
+        const double n = pars.poly_const;
+        const double fact1 = tgamma(n+1.5)/tgamma(n+1.)/pars.star_radius;
+        const double fact2 = pars.star_mass/sqrt(M_PI);
+        pars.lambda = pow(fact1*fact2,1./n)*2.*(1.+n)*pars.pressure_const/pow(pars.star_radius,2);
     }
 
     //System evolution parameters
@@ -380,6 +432,19 @@ int main(int argc, char* argv[]){
             }
         }
         EvolveIt<Vec3>(pars,&r,&v,&m);
+    } else if (pars.mode == Monodimensional ){
+        std::vector<Vec1> r;
+        std::vector<Vec1> v;
+        std::vector<double> m;
+        Vec1 pos = Vec1();
+        Vec1 vel = Vec1();
+        for (int ix = 0; ix<pars.nside; ++ix){
+            pos.x = -pars.L/2 + ix*pars.dL;
+            r.push_back(pos);
+            v.push_back(vel);
+            m.push_back(pars.particle_mass);
+        }
+        EvolveIt<Vec1>(pars,&r,&v,&m);
     }
 
 

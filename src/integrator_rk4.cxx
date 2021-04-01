@@ -118,4 +118,7 @@ template IntegratorRK4<Vec2>::IntegratorRK4(ParticleSystem<Vec2>* lcurrent,
                                             ParticleSystem<Vec2>* lnext,
                                             ParticleSystem<Vec2>* lbuffer,
                                             double ldt);
-
+template IntegratorRK4<Vec1>::IntegratorRK4(ParticleSystem<Vec1>* lcurrent,
+                                            ParticleSystem<Vec1>* lnext,
+                                            ParticleSystem<Vec1>* lbuffer,
+                                            double ldt);

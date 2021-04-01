@@ -2,6 +2,11 @@ if (APPLE)
     set(CompileFlags "${CompileFlags} -DAPPLE")
 endif (APPLE)
 
+add_library(vec1 SHARED vec1.cxx)
+set_target_properties (vec1 PROPERTIES COMPILE_FLAGS "${CompileFlags}")
+set_target_properties (vec1 PROPERTIES VERSION "0.1.0")
+set_target_properties (vec1 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib/)
+
 add_library(vec2 SHARED vec2.cxx)
 set_target_properties (vec2 PROPERTIES COMPILE_FLAGS "${CompileFlags}")
 set_target_properties (vec2 PROPERTIES VERSION "0.1.0")
