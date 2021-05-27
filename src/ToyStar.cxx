@@ -353,7 +353,7 @@ int main(int argc, char* argv[]){
     ToyStarPars pars;
     pars.mode = Bidimensional;
     //pars.mode = Tridimensional; 
-    pars.mode = Monodimensional;
+    //pars.mode = Monodimensional;
     pars.dynamical_plots_enabled = true;
     
     //System parameters - initial positions
