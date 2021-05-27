@@ -358,7 +358,7 @@ int main(int argc, char* argv[]){
     
     //System parameters - initial positions
     pars.L = 2;
-    pars.nside = 20*20;//*5*4;
+    pars.nside = 20;
     pars.dL = 2*pars.L/pars.nside;
 
     //System parameters
