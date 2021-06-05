@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 # default build type: Release
 if (NOT CMAKE_BUILD_TYPE)
-    #set(CMAKE_BUILD_TYPE "Release")
-    set(CMAKE_BUILD_TYPE "Debug")
+    set(CMAKE_BUILD_TYPE "Release")
+    #set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
